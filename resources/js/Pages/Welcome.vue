@@ -368,11 +368,12 @@
                             </div>
 
                             <div class="mt-4">
-                                <InputLabel for="bairro" value="Voltagem (aparelho eletrico)" />
+                                <InputLabel for="bairro" value="Voltagem" />
 
                                 <select id="preferencia" class="mt-1 block w-full" v-model="form.voltagem">
                                     <option value="110">110</option>
                                     <option value="220">220</option>
+                                    <option value="Nao aplicavel">Não aplicável</option>
                                 </select>
                             </div>
 
@@ -395,7 +396,7 @@
                             </div>
 
                             <div class="mt-4">
-                                <InputLabel for="troca" value="Realiza troca no item?" />
+                                <InputLabel for="troca" value="Aceita crédito (voucher) para uso na loja?" />
 
                                 <select id="troca" class="mt-1 block w-full" v-model="form.troca">
                                     <option value="1">Sim</option>
