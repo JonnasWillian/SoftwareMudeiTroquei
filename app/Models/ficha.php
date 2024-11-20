@@ -3,6 +3,8 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Notifications\Notifiable;
 
 class ficha extends Model
 {
@@ -42,5 +44,6 @@ class ficha extends Model
         'desmontagem',
         'valorEstimado',
         'status',
+        'urgente',
     ];
 }

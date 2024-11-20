@@ -32,6 +32,7 @@ return new class extends Migration
             $table->string('foto2');
             $table->string('foto3');
             $table->string('status');
+            $table->string('urgente');
             $table->decimal('quantidade', 12, 2);
             $table->string('outroBairro')->nullable();
             $table->string('voltagem');

@@ -10,6 +10,11 @@
     const imageUrls = ref([]); // Armazena URLs de pré-visualização
     const imageFiles = ref([]); // Armazena os arquivos reais
     const errorMessage = ref('');
+    const showModal = ref(false);
+
+    const openModal = () => {
+        showModal.value = true;
+    };
 
     // Adiciona imagem
     const handleFileChange = (event) => {
@@ -123,7 +128,6 @@
                 formEnv.append('largura', form.largura);
                 formEnv.append('profundidade', form.profundidade);
                 formEnv.append('foto1', imageFiles.value[0] ? imageFiles.value[0] : ''); // Aqui o arquivo real é anexado
-                console.log('foto1', imageFiles.value[0])
                 formEnv.append('foto2', imageFiles.value[1] ? imageFiles.value[1] : ''); // Aqui o arquivo real é anexado
                 formEnv.append('foto3', imageFiles.value[2] ? imageFiles.value[2] : ''); // Aqui o arquivo real é anexado
                 formEnv.append('quantidade', form.quantidade);
@@ -147,10 +151,11 @@
             // Enviar os dados
             await router.post(route('ficha.store'), formEnv, {
                 onSuccess: () => {
- 
-                    form.descricao = '';
-                    form.image = null;
+                    openModal();
 
+                    setTimeout(() => {
+                        window.location.href = '/';
+                    }, 5000);
                 },
                 onError: (errors) => {
                     errorMessage.value = 'Enviar apenas imagens ou vídeos no formato MP4.';
@@ -382,7 +387,6 @@
                                     <option value="12">Tanque</option>
                                     <option value="13">Praça Seca</option>
                                     <option value="14">Madureira</option>
-                                    <option value="15">Cascadura</option>
                                     <option value="16">Cascadura</option>
                                     <option value="17">Campinho</option>
                                     <option value="18">Méier</option>
@@ -580,6 +584,12 @@
                     Todos direitos reservados <a href="https://mudeitroquei.com.br/" target="_blank"><b style="color: #96AE8A;" >Mudei Troquei</b></a> COPYRIGHT © 2024
                 </footer>
             </div>
+        </div>
+    </div>
+
+    <div v-if="showModal" class="fixed inset-0 flex items-center justify-center bg-gray-500 bg-opacity-75">
+        <div class="bg-white p-6 rounded-lg shadow-lg w-1/5">
+            <h2 class="text-xl mb-4 text-green-400">Formulário enviado</h2>
         </div>
     </div>
 </template>
