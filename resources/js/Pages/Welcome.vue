@@ -1,6 +1,7 @@
 <script setup>
     import { Head, Link, useForm } from '@inertiajs/vue3';
     import { ref, computed } from 'vue';
+    import { router } from '@inertiajs/vue3';
 
     // Components
     import InputLabel from '@/Components/InputLabel.vue'
@@ -8,6 +9,7 @@
 
     const imageUrls = ref([]); // Armazena URLs de pré-visualização
     const imageFiles = ref([]); // Armazena os arquivos reais
+    const errorMessage = ref('');
 
     // Adiciona imagem
     const handleFileChange = (event) => {
@@ -54,6 +56,8 @@
         outroBairro: '',
         voltagem: '',
         tipoEstado: '',
+        cpf: '',
+        desmontagem: '',
         
         // Flags
         bairro: '',
@@ -103,13 +107,64 @@
     };
 
     // Função de envio do formulário
-    const submit = () => {
-        console.log('imageUrls', imageUrls.value)
-        console.log('imageFiles', imageFiles.value)
-        // form.foto = imageFile.value ? imageFile.value : '';
+    const submit = async () => {
+        try {
+            const formEnv = new FormData();
+                formEnv.append('nome', form.nome);
+                formEnv.append('telefone', form.telefone);
+                formEnv.append('email', form.email);
+                formEnv.append('produto', form.produto);
+                formEnv.append('marca', form.marca);
+                formEnv.append('dtCompra', form.dtCompra);
+                formEnv.append('valor', form.valor);
+                formEnv.append('marcaUso', form.marcaUso);
+                formEnv.append('descricao', form.descricao);
+                formEnv.append('altura', form.altura);
+                formEnv.append('largura', form.largura);
+                formEnv.append('profundidade', form.profundidade);
+                formEnv.append('foto1', imageFiles.value[0] ? imageFiles.value[0] : ''); // Aqui o arquivo real é anexado
+                console.log('foto1', imageFiles.value[0])
+                formEnv.append('foto2', imageFiles.value[1] ? imageFiles.value[1] : ''); // Aqui o arquivo real é anexado
+                formEnv.append('foto3', imageFiles.value[2] ? imageFiles.value[2] : ''); // Aqui o arquivo real é anexado
+                formEnv.append('quantidade', form.quantidade);
+                formEnv.append('outroBairro', form.outroBairro ? form.outroBairro : '');
+                formEnv.append('voltagem', form.voltagem);
+                formEnv.append('tipoEstado', form.tipoEstado);
+                formEnv.append('bairro', form.bairro);
+                formEnv.append('novo', form.novo);
+                formEnv.append('usado', form.usado);
+                formEnv.append('troca', form.troca);
+                formEnv.append('nf', form.nf);
+                formEnv.append('sujo', form.sujo);
+                formEnv.append('mofo', form.mofo);
+                formEnv.append('cupim', form.cupim);
+                formEnv.append('cpf', form.cpf);
+                formEnv.append('trincado', form.trincado);
+                formEnv.append('desmontagem', form.desmontagem);
+            formEnv.append('_token', document.querySelector('meta[name="csrf-token"]').getAttribute('content'));
+            errorMessage.value = '';
 
-        // localStorage.setItem('form', JSON.stringify(form));
-        // window.location.href = '/Interesses';
+            // Enviar os dados
+            await router.post(route('ficha.store'), formEnv, {
+                onSuccess: () => {
+ 
+                    form.descricao = '';
+                    form.image = null;
+
+                },
+                onError: (errors) => {
+                    errorMessage.value = 'Enviar apenas imagens ou vídeos no formato MP4.';
+                    console.log('erro', errors);
+                },
+                headers: {
+                    'Content-Type': 'multipart/form-data' // Garante o envio correto do arquivo
+                }
+            });
+
+        } catch (error) {
+            errorMessage.value = 'Ocorreu um erro inesperado. Tente novamente mais tarde.';
+            console.log("Erro ao enviar o formulário:", error);
+        }
     };
 </script>
 
@@ -153,6 +208,23 @@
                 <main class="mt-6">
                     <div class="espacoLogin">
                         <form @submit.prevent="submit" class="text-left formLogin items-center items-center ">
+
+                            <div v-if="errorMessage" class="mb-4">
+                                <div class="flex items-center justify-between p-4 bg-red-100 border-l-4 border-red-500 text-red-700">
+                                    <div class="flex items-center">
+                                        <svg class="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 5.636l-12.728 12.728M5.636 5.636l12.728 12.728"></path>
+                                        </svg>
+                                        <span>{{ errorMessage }}</span>
+                                    </div>
+                                    <button @click="errorMessage = ''" class="text-red-700 hover:text-red-900">
+                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                                        </svg>
+                                    </button>
+                                </div>
+                            </div>
+
                             <div>
                                 <InputLabel for="Nome" value="Nome:" />
                 
@@ -381,8 +453,17 @@
                                 <InputLabel for="limpeza" value="Precisa de limpeza" />
 
                                 <select id="limpeza" class="mt-1 block w-full" v-model="form.sujo">
-                                    <option value="1">Sim</option>
-                                    <option value="2">Não</option>
+                                    <option value="Sim">Sim</option>
+                                    <option value="Não">Não</option>
+                                </select>
+                            </div>
+
+                            <div class="mt-4">
+                                <InputLabel for="desmontagem" value="Precisa de desmontagem" />
+
+                                <select id="desmontagem" class="mt-1 block w-full" v-model="form.desmontagem">
+                                    <option value="Sim">Sim</option>
+                                    <option value="Não">Não</option>
                                 </select>
                             </div>
 
@@ -390,8 +471,8 @@
                                 <InputLabel for="nota" value="Possui nota fiscal?" />
 
                                 <select id="nota" class="mt-1 block w-full" v-model="form.nf">
-                                    <option value="1">Sim</option>
-                                    <option value="2">Não</option>
+                                    <option value="Sim">Sim</option>
+                                    <option value="Não">Não</option>
                                 </select>
                             </div>
 
@@ -399,8 +480,8 @@
                                 <InputLabel for="troca" value="Aceita crédito (voucher) para uso na loja?" />
 
                                 <select id="troca" class="mt-1 block w-full" v-model="form.troca">
-                                    <option value="1">Sim</option>
-                                    <option value="2">Não</option>
+                                    <option value="Sim">Sim</option>
+                                    <option value="Não">Não</option>
                                 </select>
                             </div>
 
@@ -408,9 +489,9 @@
                                 <InputLabel for="Estado" value="Tipo de reparo" />
 
                                 <select id="Estado" class="mt-1 block w-full" v-model="form.tipoEstado">
-                                    <option value="1">Reparo</option>
-                                    <option value="2">Limpeza</option>
-                                    <option value="3">Estofamento</option>
+                                    <option value="Reparo">Reparo</option>
+                                    <option value="Limpeza">Limpeza</option>
+                                    <option value="Estofamento">Estofamento</option>
                                 </select>
                             </div>
 

@@ -1,6 +1,9 @@
 <script setup>
-import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
-import { Head } from '@inertiajs/vue3';
+    import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
+    import { Head } from '@inertiajs/vue3';
+    import { ref, onMounted, watch } from 'vue';
+
+    const tipo = ref(1);
 </script>
 
 <template>
@@ -8,11 +11,21 @@ import { Head } from '@inertiajs/vue3';
 
     <AuthenticatedLayout>
         <template #header>
-            <h2
-                class="text-xl font-semibold leading-tight text-gray-800"
-            >
-                Dashboard
-            </h2>
+            <h2 class="text-xl font-semibold leading-tight text-gray-800">Dashboard</h2>
+            <br>
+            <!-- <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
+                <NavLink :href="route('dashboard')" :active="route().current('dashboard')">Feed</NavLink>
+            </div> -->
+
+            <div class="mt-4">
+                <InputLabel for="email" value="Preferência" />
+
+                <select id="preferencia" class="mt-1 block w-full" v-model="tipo">
+                    <option value="1">Em analise</option>
+                    <option value="2">Aprovados</option>
+                    <option value="3">Recusados</option>
+                </select>
+            </div>
         </template>
 
         <div class="py-12">
