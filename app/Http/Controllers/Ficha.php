@@ -145,6 +145,13 @@ class Ficha extends Controller
         FichaFomulario::create($inserir);
     }
 
-    public function view(Request $request)
-    {}
+    public function list($statusId)
+    {
+        // Consulta os posts filtrando pelo campo 'nicho'
+        $ficha = FichaFomulario::where('status', $statusId)
+            ->orderBy('updated_at', 'desc') // Ordena pelos mais recentes
+            ->get();
+
+        return response()->json($ficha);
+    }
 }

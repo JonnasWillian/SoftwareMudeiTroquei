@@ -155,7 +155,7 @@
 
                     setTimeout(() => {
                         window.location.href = '/';
-                    }, 5000);
+                    }, 15000);
                 },
                 onError: (errors) => {
                     errorMessage.value = 'Enviar apenas imagens ou vídeos no formato MP4.';
@@ -589,7 +589,7 @@
 
     <div v-if="showModal" class="fixed inset-0 flex items-center justify-center bg-gray-500 bg-opacity-75">
         <div class="bg-white p-6 rounded-lg shadow-lg w-1/5">
-            <h2 class="text-xl mb-4 text-green-400">Formulário enviado</h2>
+            <h2 class="text-xl mb-4 text-green-400">Formulário enviado. Aguarde o contato da nossa equipe 💚</h2>
         </div>
     </div>
 </template>

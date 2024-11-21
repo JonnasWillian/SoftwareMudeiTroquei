@@ -20,7 +20,9 @@ Route::get('/dashboard', function () {
     return Inertia::render('Dashboard');
 })->middleware(['auth', 'verified'])->name('dashboard');
 
-Route::post('/fichaCreate', [Ficha::class, 'store'])->name('ficha.store'); // Criar Posts
+Route::post('/fichaCreate', [Ficha::class, 'store'])->name('ficha.store'); // Criar Ficha
+Route::get('/ficha/{statusId}', [Ficha::class, 'list'])->name('ficha.list'); // Listar fichas
+Route::get('/fichaView/{statusId}', [Ficha::class, 'view'])->name('ficha.view'); // Ver Ficha
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
