@@ -36,6 +36,7 @@ return new class extends Migration
             $table->decimal('quantidade', 12, 2);
             $table->string('outroBairro')->nullable();
             $table->string('voltagem');
+            $table->string('cpf');
             // Flags
             $table->string('bairro');
             $table->string('tipoEstado')->nullable();

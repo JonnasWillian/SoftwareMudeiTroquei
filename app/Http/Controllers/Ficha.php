@@ -107,6 +107,7 @@ class Ficha extends Controller
 
         $inserir = array(
             'nome' => $request->nome,
+            'cpf' => $request->cpf,
             'telefone' => $request->telefone,
             'email' => $request->email,
             'produto' => $request->produto,
@@ -152,6 +153,13 @@ class Ficha extends Controller
             ->orderBy('updated_at', 'desc') // Ordena pelos mais recentes
             ->get();
 
+        return response()->json($ficha);
+    }
+
+    public function view($idFicha)
+    {
+        // Consulta os posts filtrando pelo campo 'nicho'
+        $ficha = FichaFomulario::where('id', $idFicha)->get();
         return response()->json($ficha);
     }
 }

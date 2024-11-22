@@ -44,6 +44,7 @@ class ficha extends Model
         'desmontagem',
         'valorEstimado',
         'status',
+        'cpf',
         'urgente',
     ];
 }

@@ -24,6 +24,11 @@
         fetchPosts(tipo); // Realiza a consulta inicial ao carregar a página
     });
 
+    const verFicha = (id) => {
+        localStorage.setItem('id', JSON.stringify(id));
+        window.location.href = '/fichas';
+    };
+
     watch(tipo, () => {
         fetchPosts(tipo) // Atualiza a consulta
     }, { deep: true });
@@ -70,10 +75,12 @@
                             </thead>
                             <tbody>
                                 <tr  v-for="list in lista" :key="list.id">
-                                    <td>
-                                        <Link href="route('ficha.view/{{list.id}}')">
+                                    <td @click="verFicha(list.id)">
+                                        <!-- <Link
+                                            href="route('fichas')"
+                                        > -->
                                             <i class="material-icons">folder_open</i>
-                                        </Link>
+                                        <!-- </Link> -->
                                     </td>
                                     <td>{{list.produto}}</td>
                                     <td>{{list.descricao}}</td>
@@ -93,9 +100,7 @@
 <style scoped>
 
     th, td {
-        padding: 10px  60px;
+        padding: 10px  70px;
     }
-
-    
 
 </style>

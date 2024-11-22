@@ -22,6 +22,7 @@ Route::get('/dashboard', function () {
 
 Route::post('/fichaCreate', [Ficha::class, 'store'])->name('ficha.store'); // Criar Ficha
 Route::get('/ficha/{statusId}', [Ficha::class, 'list'])->name('ficha.list'); // Listar fichas
+Route::get('/fichas', function () { return Inertia::render('Ficha');})->middleware(['auth', 'verified'])->name('fichas');
 Route::get('/fichaView/{statusId}', [Ficha::class, 'view'])->name('ficha.view'); // Ver Ficha
 
 Route::middleware('auth')->group(function () {
