@@ -1,12 +1,19 @@
 <script setup>
     import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
     import { Link, useForm } from '@inertiajs/vue3';
-    import { ref, onMounted, watch } from 'vue';
+    import { ref, onMounted, watch, computed } from 'vue';
     import axios from 'axios';
 
     const id = JSON.parse(localStorage.getItem('id'));
     const lista = ref([]); 
+    const demandaMedia = ref('');
+    const demandaAlta = ref('');
     const currentIndex = ref({}); // Armazena o índice da imagem para cada item
+    const statusAtual = ref('');
+    const status = [];
+    status[1] = "Em analise";
+    status[2] = "Aprovados";
+    status[3] = "Recusados";
 
     // Função para buscar posts
     const fetchPosts = async (id) => {
@@ -14,6 +21,14 @@
             const response = await axios.get(`/fichaView/${id}`);
             lista.value = response.data;
             console.log('lista', lista.value);
+
+            const valor = Number(lista.value[0].valorEstimado); // Converte para número
+            demandaMedia.value = (valor + valor * 0.05).toFixed(2); // Calcula e retorna formatado
+
+            const valorAlta = Number(lista.value[0].valorEstimado); // Converte para número
+            demandaAlta.value = (valorAlta + valorAlta * 0.10).toFixed(2); // Calcula e retorna formatado
+
+            statusAtual.value = lista.value[0].status
         } catch (error) {
             console.error("Erro ao consultar os posts:", error);
         }
@@ -98,8 +113,32 @@
         fetchPosts(id); // Atualiza a consulta
     }, { deep: true });
 
-</script>
+    // Função de envio do formulário
+    const submit = async () => {
+        try {
+            const formEnv = new FormData();
+                formEnv.append('status', statusAtual);
+                formEnv.append('id', id);
+            formEnv.append('_token', document.querySelector('meta[name="csrf-token"]').getAttribute('content'));
 
+            // Enviar os dados
+            await router.post(route('ficha.update'), formEnv, {
+                onSuccess: () => {
+                        window.location.href = '/fichas';
+                },
+                onError: (errors) => {
+                    console.log('erro', errors);
+                },
+                headers: {
+                    'Content-Type': 'multipart/form-data' // Garante o envio correto do arquivo
+                }
+            });
+
+        } catch (error) {
+            console.log("Erro ao enviar o formulário:", error);
+        }
+    };
+</script>
 
 <template>
     <AuthenticatedLayout>
@@ -173,6 +212,12 @@
                                 <li><strong>Valor estimado (gastos): </strong> {{ list.valorEstimado }}</li>
                                 <li><strong>Valor comercial (google): </strong> {{  }}</li>
                             </ul>
+
+                            <ul>
+                                <li class="text-green-500"><strong>Demanda Baixa:</strong> {{ list.valorEstimado }}</li>   
+                                <li class="text-orange-400"><strong>Demanda Média:</strong> {{ demandaMedia }}</li>
+                                <li class="text-red-600"><strong>Demanda Alta:</strong> {{ demandaAlta }}</li>
+                            </ul>
                             </div>
 
                           <!-- Detalhes adicionais -->
@@ -200,7 +245,21 @@
                                 </ul>
 
                                 <ul>
-                                    <!-- <li><strong>Usado:</strong> {{ resposta[list.usado] }}</li> -->
+                                    <form @submit.prevent="submit">
+                                        <li>
+                                            <strong>Stataus:</strong>
+                                            <select id="preferencia" class="mt-1 block w-full" v-model="statusAtual">
+                                                <option value="1">{{status[1]}}</option>
+                                                <option value="2">{{status[2]}}</option>
+                                                <option value="3">{{status[3]}}</option>
+                                            </select>
+                                            <div class="mt-4 block">
+                                                <div class="container">
+                                                    <button class="buttonLogin">Atualizar</button>
+                                                </div>
+                                            </div>
+                                        </li>
+                                    </form>
                                 </ul>
                             </div>
                         </div>
@@ -216,22 +275,44 @@
     th, td {
         padding: 10px  60px;
     }
+
     button {
-  background-color: #fff;
-  border: none;
-  cursor: pointer;
-  font-size: 1.25rem;
-  padding: 0.5rem;
-  transition: background-color 0.2s;
-}
+        background-color: #fff;
+        border: none;
+        cursor: pointer;
+        font-size: 1.25rem;
+        padding: 0.5rem;
+        transition: background-color 0.2s;
+    }
 
-button:hover {
-  background-color: #f0f0f0;
-}
+    button:hover {
+        background-color: #f0f0f0;
+    }
 
-/* Imagens dentro do slider */
-img {
+    /* Imagens dentro do slider */
+    img {
+        transition: all 0.3s ease-in-out;
+    }
 
-  transition: all 0.3s ease-in-out;
-}
+    .container {
+        text-align: center;
+    }
+
+    .buttonLogin {
+        background: linear-gradient(162.8deg, #FFFFFF -20.14%, #955837 57.49%);
+        box-shadow: 0px 5px 25px -10px #000000;
+        border-radius: 100px;
+        border: none;
+        color: white;
+        padding: 15px 30px;
+        border-radius: 25px;
+        font-size: 18px;
+        cursor: pointer;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+        transition: transform 0.1s ease;
+    }
+
+    .buttonLogin:hover {
+        transform: scale(1.05);
+    }
 </style>
