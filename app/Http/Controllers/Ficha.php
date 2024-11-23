@@ -162,4 +162,15 @@ class Ficha extends Controller
         $ficha = FichaFomulario::where('id', $idFicha)->get();
         return response()->json($ficha);
     }
+
+    public function update (Request $request)
+    {
+        $ficha = FichaFomulario::findOrFail($request->id);
+
+        // Atribui os novos valores aos atributos
+        $ficha->status = $request->status;
+    
+        // Salva no banco de dados
+        $ficha->save();
+    }
 }

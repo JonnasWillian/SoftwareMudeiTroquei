@@ -3,6 +3,7 @@
     import { Link, useForm } from '@inertiajs/vue3';
     import { ref, onMounted, watch, computed } from 'vue';
     import axios from 'axios';
+    import { router } from '@inertiajs/vue3';
 
     const id = JSON.parse(localStorage.getItem('id'));
     const lista = ref([]); 
@@ -117,7 +118,7 @@
     const submit = async () => {
         try {
             const formEnv = new FormData();
-                formEnv.append('status', statusAtual);
+                formEnv.append('status', statusAtual.value);
                 formEnv.append('id', id);
             formEnv.append('_token', document.querySelector('meta[name="csrf-token"]').getAttribute('content'));
 
