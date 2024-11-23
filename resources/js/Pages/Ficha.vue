@@ -1,19 +1,33 @@
 <script setup>
     import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
-    import { Head, Link, useForm } from '@inertiajs/vue3';
+    import { Link, useForm } from '@inertiajs/vue3';
     import { ref, onMounted, watch } from 'vue';
+    import axios from 'axios';
 
     const id = JSON.parse(localStorage.getItem('id'));
-    const lista = ref([]);
+    const lista = ref([]); 
+    const currentIndex = ref({}); // Armazena o índice da imagem para cada item
 
-    const fetchPosts= async (id) => {
+    // Função para buscar posts
+    const fetchPosts = async (id) => {
         try {
             const response = await axios.get(`/fichaView/${id}`);
-            lista.value = response.data; // Atualiza os posts com os dados recebidos
-            console.log('lista', lista.value)
+            lista.value = response.data;
+            console.log('lista', lista.value);
         } catch (error) {
             console.error("Erro ao consultar os posts:", error);
         }
+    };
+
+    // Funções de navegação de imagens
+    const prevImage = (id) => {
+        if (!currentIndex.value[id]) currentIndex.value[id] = 0;
+        currentIndex.value[id] = (currentIndex.value[id] - 1 + 2) % 3; 
+    };
+
+    const nextImage = (id) => {
+        if (!currentIndex.value[id]) currentIndex.value[id] = 0;
+        currentIndex.value[id] = (currentIndex.value[id] + 1) % 3;
     };
 
     const resposta = [];
@@ -21,222 +35,175 @@
     resposta["1"]= 'Sim';
 
     const bairros = [];
-    bairros["1"]= 'Barra da Tijuca';
-    bairros["2"]= 'Recreio dos Bandeirantes';
-    bairros["3"]= 'Vargem Grande';
-    bairros["4"]= 'Vargem Pequena';
-    bairros["5"]= 'Gardênia Azul';
-    bairros["6"]= 'Cidade de Deus';
-    bairros["7"]= 'Curicica';
-    bairros["8"]= 'Taquara';
-    bairros["9"]= 'Pechincha';
-    bairros["10"] = 'Freguesia (Jacarepaguá)';
-    bairros["11"] = 'Camorim';
-    bairros["12"] = 'Tanque';
-    bairros["13"] = 'Praça Seca';
-    bairros["14"] = 'Madureira';
-    bairros["16"] = 'Cascadura';
-    bairros["17"] = 'Campinho';
-    bairros["18"] = 'Méier';
-    bairros["19"] = 'Engenho de Dentro';
-    bairros["20"] = 'Vila Isabel';
-    bairros["21"] = 'Tijuca';
-    bairros["22"] = 'Maracanã';
-    bairros["23"] = 'São Cristóvão';
-    bairros["24"] = 'Centro';
-    bairros["25"] = 'Flamengo';
-    bairros["26"] = 'Botafogo';
-    bairros["27"] = 'Copacabana';
-    bairros["28"] = 'Ipanema';
-    bairros["29"] = 'Leblon';
-    bairros["30"] = 'Jardim Botânico';
-    bairros["31"] = 'Laranjeiras';
-    bairros["32"] = 'Cosme Velho';
-    bairros["33"] = 'Glória';
-    bairros["34"] = 'Santa Teresa';
-    bairros["35"] = 'Lapa';
-    bairros["36"] = 'Penha';
-    bairros["37"] = 'Olaria';
-    bairros["38"] = 'Ramos';
-    bairros["39"] = 'Bonsucesso';
-    bairros["40"] = 'Ilha do Governador';
-    bairros["41"] = 'Pavuna';
-    bairros["42"] = 'Anchieta';
-    bairros["43"] = 'Guadalupe';
-    bairros["44"] = 'Deodoro';
-    bairros["45"] = 'Realengo';
-    bairros["46"] = 'Bangu';
-    bairros["47"] = 'Campo Grande';
-    bairros["48"] = 'Santa Cruz';
-    bairros["49"] = 'Sepetiba';
-    bairros["50"] = 'Guaratiba';
-    bairros["51"] = 'Pedra de Guaratiba';
-    bairros["52"] = 'Grajaú';
-    bairros["53"] = 'Engenho Novo';
-    bairros["54"] = 'Rocha Miranda';
+        bairros["1"]= 'Barra da Tijuca';
+        bairros["2"]= 'Recreio dos Bandeirantes';
+        bairros["3"]= 'Vargem Grande';
+        bairros["4"]= 'Vargem Pequena';
+        bairros["5"]= 'Gardênia Azul';
+        bairros["6"]= 'Cidade de Deus';
+        bairros["7"]= 'Curicica';
+        bairros["8"]= 'Taquara';
+        bairros["9"]= 'Pechincha';
+        bairros["10"] = 'Freguesia (Jacarepaguá)';
+        bairros["11"] = 'Camorim';
+        bairros["12"] = 'Tanque';
+        bairros["13"] = 'Praça Seca';
+        bairros["14"] = 'Madureira';
+        bairros["16"] = 'Cascadura';
+        bairros["17"] = 'Campinho';
+        bairros["18"] = 'Méier';
+        bairros["19"] = 'Engenho de Dentro';
+        bairros["20"] = 'Vila Isabel';
+        bairros["21"] = 'Tijuca';
+        bairros["22"] = 'Maracanã';
+        bairros["23"] = 'São Cristóvão';
+        bairros["24"] = 'Centro';
+        bairros["25"] = 'Flamengo';
+        bairros["26"] = 'Botafogo';
+        bairros["27"] = 'Copacabana';
+        bairros["28"] = 'Ipanema';
+        bairros["29"] = 'Leblon';
+        bairros["30"] = 'Jardim Botânico';
+        bairros["31"] = 'Laranjeiras';
+        bairros["32"] = 'Cosme Velho';
+        bairros["33"] = 'Glória';
+        bairros["34"] = 'Santa Teresa';
+        bairros["35"] = 'Lapa';
+        bairros["36"] = 'Penha';
+        bairros["37"] = 'Olaria';
+        bairros["38"] = 'Ramos';
+        bairros["39"] = 'Bonsucesso';
+        bairros["40"] = 'Ilha do Governador';
+        bairros["41"] = 'Pavuna';
+        bairros["42"] = 'Anchieta';
+        bairros["43"] = 'Guadalupe';
+        bairros["44"] = 'Deodoro';
+        bairros["45"] = 'Realengo';
+        bairros["46"] = 'Bangu';
+        bairros["47"] = 'Campo Grande';
+        bairros["48"] = 'Santa Cruz';
+        bairros["49"] = 'Sepetiba';
+        bairros["50"] = 'Guaratiba';
+        bairros["51"] = 'Pedra de Guaratiba';
+        bairros["52"] = 'Grajaú';
+        bairros["53"] = 'Engenho Novo';
+        bairros["54"] = 'Rocha Miranda';
     bairros["55"] = 'Higienópolis';
 
     onMounted(() => {
-        fetchPosts(id); // Realiza a consulta inicial ao carregar a página
+        fetchPosts(id); 
     });
 
-    watch(id, () => {
-        fetchPosts(id) // Atualiza a consulta
+    watch(() => id, () => {
+        fetchPosts(id); // Atualiza a consulta
     }, { deep: true });
+
 </script>
 
+
 <template>
-    <Head title="Dashboard" />
-
     <AuthenticatedLayout>
-        <template #header>
-            <h2 class="text-xl font-semibold leading-tight text-gray-800">Ficha do item</h2>
-            <br>
-        </template>
-
+        <br>
         <div class="py-12">
+            <Link href="/dashboard">
+                <button class="absolute left-14 top-1/10 transform -translate-y-1/2 bg-gray-200 p-2 rounded-full" @click="prevImage(list.id)">&#8592; Voltar</button>
+            </Link>
             <div class="mx-auto max-w-7xl sm:px-6 lg:px-8">
-                <div class="overflow-hidden bg-white shadow-sm sm:rounded-lg">
-                    <div class="text-gray-900">
-                        <h2 class="text-xl font-semibold leading-tight text-gray-800 p-5">Dados do cliente</h2>
-                        <table class="table-auto w-full">
-                            <thead>
-                                <tr class="bg-gray-200 ">
-                                    <th>Nome</th>
-                                    <th>Telefone</th>
-                                    <th>Email</th>
-                                    <th>CPF</th>
-                                    <th>Bairro</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr v-for="list in lista" :key="list.id">
-                                    <td>{{list.nome}}</td>
-                                    <td>{{list.telefone}}</td>
-                                    <td>{{list.email}}</td>
-                                    <td>{{list.cpf}}</td>
-                                    <td>{{bairros[list.bairro]}}</td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
+                <div class="overflow-hidden bg-white shadow-sm sm:rounded-lg p-6">
+                    <!-- Itens em formato de cards -->
+                    <div class="w-full   ">
+                        <div v-for="list in lista" :key="list.id" class="border border-gray-300 rounded-lg p-4">
+                            <div class="flex">
+                                <h2 class="text-xl font-semibold leading-tight text-gray-800">Ficha do item</h2>
+                            </div>
+                            <!-- Imagens -->
+                            <div class="relative">
+                                <!-- Controles para passar imagens -->
+                                <button class="absolute left-0 top-1/2 transform -translate-y-1/2 bg-gray-200 p-2 rounded-full" @click="prevImage(list.id)">&#8592;</button>
+                                <button class="absolute right-0 top-1/2 transform -translate-y-1/2 bg-gray-200 p-2 rounded-full" @click="nextImage(list.id)">&#8594;</button>
 
-                    <div class="p-10">
-                    </div>
-                    <h2 class="text-xl font-semibold leading-tight text-gray-800 p-5">Dados do produto</h2>
-                    <table class="table-auto w-full">
-                        <thead>
-                            <tr class="bg-gray-200 ">
-                                <th>Nome</th>
-                                <th>Descricao</th>
-                                <th>Marca</th>
-                                <th>Data da compra</th>
-                                <th>Bairro alternativo</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr v-for="list in lista" :key="list.id">
-                                <td>{{list.produto}}</td>
-                                <td>{{list.descricao}}</td>
-                                <td>{{list.marca}}</td>
-                                <td>{{list.dtCompra}}</td>
-                                <td>{{list.outroBairro}}</td>
-                            </tr>
-                        </tbody>
-                    </table>
+                                <div class="flex justify-center">
+                                    <img
+                                        v-if="list.foto1"
+                                        :src="`/storage/${list.foto1}`"
+                                        alt="Foto 1"
+                                        class="rounded-lg w-1/2 h-100 object-cover transition-all ease-in-out"
+                                    />
+                                    <img
+                                        v-if="list.foto2 && currentIndex[list.id] === 1"
+                                        :src="`/storage/${list.foto2}`"
+                                        alt="Foto 2"
+                                        class="rounded-lg w-1/2 h-100 object-cover transition-all ease-in-out"
+                                    />
+                                    <!--img
+                                        v-if="list.foto3 && currentIndex[list.id] === 2"
+                                        :src="`/storage/${list.foto3}`"
+                                        alt="Foto 3"
+                                        class="rounded-lg w-1/2 h-80 object-cover transition-all ease-in-out"
+                                    />-->
+                                </div>
+                            </div>
 
-                    <table class="table-auto w-full">
-                        <thead>
-                            <tr class="bg-gray-200 ">
-                                <th>Quantidade</th>
-                                <th>Valor ofertado</th>
-                                <th>Valor estimado (gastos)</th>
-                                <th>Valor comercial (google)</th>
-                                <th>Marca de uso</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr v-for="list in lista" :key="list.id">
-                                <td>{{list.quantidade}}</td>
-                                <td>{{list.valor}}</td>
-                                <td>{{list.valorEstimado}}</td>
-                                <td>{{}}</td>
-                                <td>{{list.marcaUso}}</td>
-                            </tr>
-                        </tbody>
-                    </table>
+                            <!-- Informações do cliente -->
+                            <h3 class="text-lg font-semibold text-gray-700 mb-2">Dados do Cliente</h3>
+                            <ul class="text-sm text-gray-600">
+                                <li><strong>Nome:</strong> {{ list.nome }}</li>
+                                <li><strong>Telefone:</strong> {{ list.telefone }}</li>
+                                <li><strong>Cpf:</strong> {{ list.cpf }}</li>
+                                <li><strong>Email:</strong> {{ list.email }}</li>
+                                <li><strong>Bairro:</strong> {{ bairros[list.bairro] }}</li>
+                            </ul>
 
-                    <table class="table-auto w-full">
-                        <thead>
-                            <tr class="bg-gray-200 ">
-                                <th>Voltagem</th>
-                                <th>Altura (cm)</th>
-                                <th>Largura (cm)</th>
-                                <th>Profundidade (cm)</th>
-                                <th>Estado</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr v-for="list in lista" :key="list.id">
-                                <td>{{list.voltagem}}</td>
-                                <td>{{list.altura}}</td>
-                                <td>{{list.largura}}</td>
-                                <td>{{list.profundidade}}</td>
-                                <td>{{list.tipoEstado}}</td>
-                            </tr>
-                        </tbody>
-                    </table>
+                            <!-- Informações do produto -->
+                            <h3 class="text-lg font-semibold text-gray-700 mt-4 mb-2">Dados do Produto</h3>
+                            <div class="grid grid-cols-1 sm:grid-cols-3 text-sm text-gray-600">
 
-                    <table class="table-auto w-full">
-                        <thead>
-                            <tr class="bg-gray-200 ">
-                                <th>Desmontagem</th>
-                                <th>Marca de uso</th>
-                                <th>Novo</th>
-                                <th>Usado</th>
-                                <th>Troca (Voucher na loja)</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr v-for="list in lista" :key="list.id">
-                                <td>{{list.desmontagem}}</td>
-                                <td>{{list.marcaUso}}</td>
-                                <td>{{resposta[list.novo]}}</td>
-                                <td>{{resposta[list.usado]}}</td>
-                                <td>{{resposta[list.troca]}}</td>
-                            </tr>
-                        </tbody>
-                    </table>
+                            <ul class="text-sm text-gray-600">
+                                <li><strong>Produto:</strong> {{ list.produto }}</li>
+                                <li><strong>Descrição:</strong> {{ list.descricao }}</li>
+                                <li><strong>Marca:</strong> {{ list.marca }}</li>
+                                <li><strong>Data da Compra:</strong> {{ list.dtCompra }}</li>
+                                <li><strong>Bairro alternativo:</strong> {{ list.outroBairro }}</li>
 
-                    <table class="table-auto w-full">
-                        <thead>
-                            <tr class="bg-gray-200 ">
-                                <th>Possui NF</th>
-                                <th>Está sujo</th>
-                                <th>Possui mofo</th>
-                                <th>Possui cupim</th>
-                                <th>Está trincado</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr v-for="list in lista" :key="list.id">
-                                <td>{{list.nf}}</td>
-                                <td>{{resposta[list.sujo]}}</td>
-                                <td>{{resposta[list.mofo]}}</td>
-                                <td>{{resposta[list.cupim]}}</td>
-                                <td>{{resposta[list.trincado]}}</td>
-                            </tr>
-                        </tbody>
-                    </table>
+                            </ul>
 
-                    <div class="p-10">
-                    </div>
-                    <h2 class="text-xl font-semibold leading-tight text-gray-800 p-5">Imagens</h2>
+                            <ul>
+                                <li><strong>Quantidade:</strong> {{ list.quantidade }}</li>
+                                <li><strong>Valor ofertado:</strong> {{ list.valor }}</li>
+                                <li><strong>Valor estimado (gastos): </strong> {{ list.valorEstimado }}</li>
+                                <li><strong>Valor comercial (google): </strong> {{  }}</li>
+                            </ul>
+                            </div>
 
-                    <div class="border border-gray-300 rounded-lg p-4 w-full max-w-md flex" v-for="list in lista" :key="list.id">
-                        <img v-if="list.foto1" class="rounded-lg mb-4 w-full p-10" :src="`/storage/${list.foto1}`">
-                        <img v-if="list.foto2" class="rounded-lg mb-4 w-full p-10" :src="`/storage/${list.foto2}`">
-                        <img v-if="list.foto3" class="rounded-lg mb-4 w-full p-10" :src="`/storage/${list.foto3}`">
+                          <!-- Detalhes adicionais -->
+                            <h3 class="text-lg font-semibold text-gray-700 mt-4 mb-2">Detalhes Adicionais</h3>
+                            <div class="grid grid-cols-1 sm:grid-cols-3 text-sm text-gray-600">
+                                <ul>
+                                    <li><strong>Voltagem:</strong> {{ list.voltagem }}</li>
+                                    <li><strong>Altura:</strong> {{ list.altura }} cm</li>
+                                    <li><strong>Largura:</strong> {{ list.largura }} cm</li>
+                                    <li><strong>Profundidade:</strong> {{ list.profundidade }} cm</li>
+                                    <li><strong>Estado:</strong> {{ list.tipoEstado }}</li>
+                                    <li><strong>Desmontagem:</strong> {{ list.desmontagem }}</li>
+                                    <li><strong>Marca de Uso:</strong> {{ list.marcaUso }}</li>
+                                    <li><strong>Novo:</strong> {{ resposta[list.novo] }}</li>
+                                </ul>
+
+                                <ul>
+                                    <li><strong>Usado:</strong> {{ resposta[list.usado] }}</li>
+                                    <li><strong>Troca:</strong> {{ resposta[list.troca] }}</li>
+                                    <li><strong>Possui NF:</strong> {{ list.nf }}</li>
+                                    <li><strong>Está Sujo:</strong> {{ resposta[list.sujo] }}</li>
+                                    <li><strong>Possui Mofo:</strong> {{ resposta[list.mofo] }}</li>
+                                    <li><strong>Possui Cupim:</strong> {{ resposta[list.cupim] }}</li>
+                                    <li><strong>Está Trincado:</strong> {{ resposta[list.trincado] }}</li>
+                                </ul>
+
+                                <ul>
+                                    <!-- <li><strong>Usado:</strong> {{ resposta[list.usado] }}</li> -->
+                                </ul>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -249,7 +216,22 @@
     th, td {
         padding: 10px  60px;
     }
+    button {
+  background-color: #fff;
+  border: none;
+  cursor: pointer;
+  font-size: 1.25rem;
+  padding: 0.5rem;
+  transition: background-color 0.2s;
+}
 
-    
+button:hover {
+  background-color: #f0f0f0;
+}
 
+/* Imagens dentro do slider */
+img {
+
+  transition: all 0.3s ease-in-out;
+}
 </style>

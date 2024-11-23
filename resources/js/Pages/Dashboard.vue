@@ -1,6 +1,6 @@
 <script setup>
     import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
-    import { Head, Link, useForm } from '@inertiajs/vue3';
+    import { Head } from '@inertiajs/vue3';
     import { ref, onMounted, watch } from 'vue';
 
     const tipo = ref(1);
@@ -73,15 +73,9 @@
                                     <th>Status</th>
                                 </tr>
                             </thead>
-                            <tbody>
-                                <tr  v-for="list in lista" :key="list.id">
-                                    <td @click="verFicha(list.id)">
-                                        <!-- <Link
-                                            href="route('fichas')"
-                                        > -->
-                                            <i class="material-icons">folder_open</i>
-                                        <!-- </Link> -->
-                                    </td>
+                            <tbody class="">
+                                <tr @click="verFicha(list.id)" class="cursor-pointer" v-for="list in lista" :key="list.id">
+                                    <td><i class="material-icons">folder_open</i></td>
                                     <td>{{list.produto}}</td>
                                     <td>{{list.descricao}}</td>
                                     <td>{{list.valor}}</td>
@@ -101,6 +95,10 @@
 
     th, td {
         padding: 10px  70px;
+    }
+
+    tr:hover {
+        background-color: rgba(150, 174, 138, 0.2); 
     }
 
 </style>
