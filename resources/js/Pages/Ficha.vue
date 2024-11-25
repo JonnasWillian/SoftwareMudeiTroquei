@@ -23,10 +23,10 @@
             lista.value = response.data;
             console.log('lista', lista.value);
 
-            const valor = Number(lista.value[0].valorEstimado); // Converte para número
+            const valor = Number(lista.value[0].valor); // Converte para número
             demandaMedia.value = (valor + valor * 0.05).toFixed(2); // Calcula e retorna formatado
 
-            const valorAlta = Number(lista.value[0].valorEstimado); // Converte para número
+            const valorAlta = Number(lista.value[0].valor); // Converte para número
             demandaAlta.value = (valorAlta + valorAlta * 0.10).toFixed(2); // Calcula e retorna formatado
 
             statusAtual.value = lista.value[0].status
@@ -202,7 +202,7 @@
                                 <li><strong>Produto:</strong> {{ list.produto }}</li>
                                 <li><strong>Descrição:</strong> {{ list.descricao }}</li>
                                 <li><strong>Marca:</strong> {{ list.marca }}</li>
-                                <li><strong>Data da Compra:</strong> {{ list.dtCompra }}</li>
+                                <li><strong>Data da Compra:</strong> {{ new Intl.DateTimeFormat('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric' }).format(new Date(list.dtCompra)) }}</li>
                                 <li><strong>Bairro alternativo:</strong> {{ list.outroBairro }}</li>
 
                             </ul>
@@ -215,7 +215,7 @@
                             </ul>
 
                             <ul>
-                                <li class="text-green-500"><strong>Demanda Baixa:</strong> {{ list.valorEstimado }}</li>   
+                                <li class="text-green-500"><strong>Demanda Baixa:</strong> {{ list.valor }}</li>   
                                 <li class="text-orange-400"><strong>Demanda Média:</strong> {{ demandaMedia }}</li>
                                 <li class="text-red-600"><strong>Demanda Alta:</strong> {{ demandaAlta }}</li>
                             </ul>
