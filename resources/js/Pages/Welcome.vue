@@ -213,7 +213,6 @@
                 <main class="mt-6">
                     <div class="espacoLogin">
                         <form @submit.prevent="submit" class="text-left formLogin items-center items-center ">
-
                             <div v-if="errorMessage" class="mb-4">
                                 <div class="flex items-center justify-between p-4 bg-red-100 border-l-4 border-red-500 text-red-700">
                                     <div class="flex items-center">
@@ -230,146 +229,91 @@
                                 </div>
                             </div>
 
-                            <div>
+                            <div class="w-2/4 sm:w-3/4 mx-auto">
                                 <InputLabel for="Nome" value="Nome:" />
                 
-                                <TextInput
-                                    id="nome"
-                                    type="text"
-                                    class="mt-1 block w-full"
-                                    placeholder="Ana"
-                                    v-model="form.nome"
-                                    required
-                                    autofocus
-                                    autocomplete="name"
-                                />
+                                <TextInput id="nome" type="text" class="mt-1 block w-full" placeholder="Ana" v-model="form.nome" required autofocus autocomplete="name"/>
                             </div>
 
-                            <div class="mt-4">
+                            <div class="mt-4 w-2/4 sm:w-3/4 mx-auto">
                                 <InputLabel for="CPF" value="CPF:" />
                 
                                 <TextInput id="CPF" type="text" class="mt-1 block w-full" placeholder="xxx.xxx.xxx-xx" v-model="form.cpf" @input="applyCpfMask" required autofocus autocomplete="cpf"/>
                             </div>
 
-                            <div class="mt-4">
+                            <div class="mt-4 w-2/4 sm:w-3/4 mx-auto">
                                 <InputLabel for="Telefone" value="telefone" />
 
                                 <TextInput id="telefone" type="text" class="mt-1 block w-full" placeholder="(55) 99999-9999" v-model="form.telefone" @input="applyPhoneMask" required autocomplete="phone"/>
                             </div>
 
-                            <div class="mt-4">
+                            <div class="mt-4 w-2/4 sm:w-3/4 mx-auto">
                                 <InputLabel for="Email" value="Email" />
 
                                 <TextInput id="Email" type="email" class="mt-1 block w-full" placeholder="teste@gmail.com" v-model="form.email" required autocomplete="email"/>
                             </div>
 
-                            <div class="mt-4">
+                            <div class="mt-4 w-2/4 sm:w-3/4 mx-auto">
                                 <InputLabel for="Produto" value="Produto" />
 
                                 <TextInput id="Produto" type="text" class="mt-1 block w-full" placeholder="Fogão" v-model="form.produto" required autocomplete="produto" />
                             </div>
 
-                            <div class="mt-4">
+                            <div class="mt-4 w-2/4 sm:w-3/4 mx-auto">
                                 <InputLabel for="marca" value="Marca" />
 
                                 <TextInput id="marca" type="text" class="mt-1 block w-full" placeholder="Brastemp" v-model="form.marca" required autocomplete="marca" />
                             </div>
 
-                            <div class="mt-4">
+                            <div class="mt-4 mx-auto w-2/4 sm:w-3/4">
                                 <InputLabel for="quantidade" value="quantidade" />
 
                                 <TextInput id="quantidade" type="number" class="mt-1 block w-full" placeholder="3" v-model="form.quantidade" min="1" required autocomplete="quantidade"/>
                             </div>
 
-                            <div class="mt-4">
+                            <div class="mt-4 w-2/4 sm:w-3/4 mx-auto">
                                 <InputLabel for="DataCompra" value="Data da compra" />
 
                                 <TextInput id="DataCompra" type="date" class="mt-1 block w-full" v-model="form.dtCompra" required autocomplete="DataCompra" />
                             </div>
 
-                            <div class="mt-4">
+                            <div class="mt-4 w-2/4 sm:w-3/4 mx-auto">
                                 <InputLabel for="Valor" value="Valor unitário" />
 
                                 <TextInput id="valor" type="number" class="mt-1 block w-full" v-model="form.valor" min="1" placeholder="3000" required autocomplete="DataCompra" step="0.01"/>
                             </div>
 
-                            <div class="mt-4">
+                            <div class="mt-4 w-2/4 sm:w-3/4 mx-auto">
                                 <InputLabel for="MarcaUso" value="Possui marcas de uso? Qual?" />
 
-                                <TextInput
-                                    id="MarcaUso"
-                                    type="text"
-                                    class="mt-1 block w-full"
-                                    v-model="form.marcaUso"
-                                    placeholder="Arranhado"
-                                    required
-                                    autocomplete="Arranhão na superficie"
-                                />
+                                <TextInput id="MarcaUso" type="text" class="mt-1 block w-full" v-model="form.marcaUso" placeholder="Arranhado" required autocomplete="Arranhão na superficie"/>
                             </div>
 
-                            <div class="mt-4">
+                            <div class="mt-4 w-2/4 sm:w-3/4 mx-auto">
                                 <InputLabel for="descricao" value="Descricao do item" />
 
-                                <TextInput
-                                    id="descricao"
-                                    type="text"
-                                    class="mt-1 block w-full"
-                                    v-model="form.descricao"
-                                    placeholder="Fogão 4 bocas"
-                                    required
-                                    autocomplete="descricao"
-                                />
+                                <TextInput id="descricao" type="text" class="mt-1 block w-full" v-model="form.descricao" placeholder="Fogão 4 bocas" required autocomplete="descricao"/>
                             </div>
 
-                            <div class="mt-4">
+                            <div class="mt-4 w-2/4 sm:w-3/4 mx-auto">
                                 <InputLabel for="altura" value="Altura do item (em Centimetros)" />
 
-                                <TextInput
-                                    id="altura"
-                                    type="number"
-                                    class="mt-1 block w-full"
-                                    v-model="form.altura"
-                                    placeholder="100"
-                                    :min="1"
-                                    step="0.01"
-                                    required
-                                    autocomplete="altura"
-                                />
+                                <TextInput id="altura" type="number" class="mt-1 block w-full" v-model="form.altura" placeholder="100" :min="1" step="0.01" required autocomplete="altura"/>
                             </div>
 
-                            <div class="mt-4">
+                            <div class="mt-4 w-2/4 sm:w-3/4 mx-auto">
                                 <InputLabel for="largura" value="Largura do item (em Centimetros)" />
 
-                                <TextInput
-                                    id="largura"
-                                    type="number"
-                                    class="mt-1 block w-full"
-                                    v-model="form.largura"
-                                    placeholder="200"
-                                    :min="1"
-                                    step="0.01"
-                                    required
-                                    autocomplete="largura"
-                                />
+                                <TextInput id="largura" type="number" class="mt-1 block w-full" v-model="form.largura" placeholder="200" :min="1" step="0.01" required autocomplete="largura"/>
                             </div>
 
-                            <div class="mt-4">
+                            <div class="mt-4 w-2/4 sm:w-3/4 mx-auto">
                                 <InputLabel for="profundidade" value="Profundidade do item (em Centimetros)" />
 
-                                <TextInput
-                                    id="profundidade"
-                                    type="number"
-                                    class="mt-1 block w-full"
-                                    v-model="form.profundidade"
-                                    placeholder="50"
-                                    :min="1"
-                                    step="0.01"
-                                    required
-                                    autocomplete="profundidade"
-                                />
+                                <TextInput id="profundidade" type="number" class="mt-1 block w-full" v-model="form.profundidade" placeholder="50" :min="1" step="0.01" required autocomplete="profundidade"/>
                             </div>
 
-                            <div class="mt-4">
+                            <div class="mt-4 w-2/4 sm:w-3/4 mx-auto">
                                 <InputLabel for="bairro" value="bairro" />
 
                                 <select id="preferencia" class="mt-1 block w-full" v-model="form.bairro">
@@ -430,20 +374,13 @@
                                 </select>
                             </div>
 
-                            <div class="mt-4">
+                            <div class="mt-4 w-2/4 sm:w-3/4 mx-auto">
                                 <InputLabel for="outroBarrio" value="Outro Bairro (inserir estimativa de frete)" />
 
-                                <TextInput
-                                    id="bairro"
-                                    type="text"
-                                    class="mt-1 block w-full"
-                                    placeholder="outro bairro - valor"
-                                    v-model="form.outroBairro"
-                                    autocomplete="bairro"
-                                />
+                                <TextInput id="bairro" type="text" class="mt-1 block w-full" placeholder="outro bairro - valor" v-model="form.outroBairro" autocomplete="bairro"/>
                             </div>
 
-                            <div class="mt-4">
+                            <div class="mt-4 w-2/4 sm:w-3/4 mx-auto">
                                 <InputLabel for="bairro" value="Voltagem" />
 
                                 <select id="preferencia" class="mt-1 block w-full" v-model="form.voltagem">
@@ -453,7 +390,7 @@
                                 </select>
                             </div>
 
-                            <div class="mt-4">
+                            <div class="mt-4 w-2/4 sm:w-3/4 mx-auto">
                                 <InputLabel for="limpeza" value="Precisa de limpeza" />
 
                                 <select id="limpeza" class="mt-1 block w-full" v-model="form.sujo">
@@ -462,7 +399,7 @@
                                 </select>
                             </div>
 
-                            <div class="mt-4">
+                            <div class="mt-4 w-2/4 sm:w-3/4 mx-auto">
                                 <InputLabel for="desmontagem" value="Precisa de desmontagem" />
 
                                 <select id="desmontagem" class="mt-1 block w-full" v-model="form.desmontagem">
@@ -471,16 +408,16 @@
                                 </select>
                             </div>
 
-                            <div class="mt-4">
+                            <div class="mt-4 w-2/4 sm:w-3/4 mx-auto">
                                 <InputLabel for="nota" value="Possui nota fiscal?" />
 
-                                <select id="nota" class="mt-1 block w-full" v-model="form.nf">
+                                <select id="nota mx-auto" class="mt-1 block w-full" v-model="form.nf">
                                     <option value="Sim">Sim</option>
                                     <option value="Não">Não</option>
                                 </select>
                             </div>
 
-                            <div class="mt-4">
+                            <div class="mt-4 w-2/4 sm:w-3/4 mx-auto">
                                 <InputLabel for="troca" value="Aceita crédito (voucher) para uso na loja?" />
 
                                 <select id="troca" class="mt-1 block w-full" v-model="form.troca">
@@ -489,7 +426,7 @@
                                 </select>
                             </div>
 
-                            <div class="mt-4">
+                            <div class="mt-4 w-2/4 sm:w-3/4 mx-auto">
                                 <InputLabel for="Estado" value="Tipo de reparo" />
 
                                 <select id="Estado" class="mt-1 block w-full" v-model="form.tipoEstado">
@@ -499,8 +436,8 @@
                                 </select>
                             </div>
 
-                            <div class="mt-4">
-                                <TextInput id="file" type="file" class="mt-1 block w-full" @change="handleFileChange" accept="image/*" multiple/>
+                            <div class="mt-4 w-2/4 sm:w-3/4 mx-auto">
+                                <TextInput id="file" type="file" class="mt-1 block w-2/4" @change="handleFileChange" accept="image/*" multiple/>
                                 <div class="flex flex-wrap items-center justify-center gap-4 mt-4">
                                     <div v-for="(url, index) in imageUrls" :key="index" class="relative">
                                         <img :src="url" alt="Pré-visualização" class="h-32 w-32 rounded-lg object-cover"/>
@@ -509,7 +446,7 @@
                                 </div>
                             </div>
 
-                            <div class="mt-4 ">
+                            <div class="mt-4  w-2/4 sm:w-3/4 mx-auto">
                                 <div class="p-6 max-w-lg mx-auto">
                                     <h2 class="text-xl font-semibold text-gray-800 mb-4">Selecione as opções:</h2>
                                     <div class="grid grid-cols-2 sm:grid-cols-3 gap-4">
