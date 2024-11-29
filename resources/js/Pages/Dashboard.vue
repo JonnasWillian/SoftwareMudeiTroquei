@@ -43,15 +43,12 @@
         <template #header>
             <h2 class="text-xl font-semibold leading-tight text-gray-800">Dashboard</h2>
             <br>
-            <!-- <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
-                <NavLink :href="route('dashboard')" :active="route().current('dashboard')">Feed</NavLink>
-            </div> -->
 
             <div class="mt-4">
-                <InputLabel for="email" value="Preferência" />
+                <InputLabel for="preferencia" value="Preferência" />
 
-                <select id="preferencia" class="mt-1 block w-full" v-model="tipo">
-                    <option value="1">Em analise</option>
+                <select id="preferencia" class="mt-1 block w-full p-2 border rounded-lg text-sm sm:w-1/3" v-model="tipo">
+                    <option value="1">Em análise</option>
                     <option value="2">Aprovados</option>
                     <option value="3">Recusados</option>
                 </select>
@@ -59,37 +56,43 @@
         </template>
 
         <div class="py-12">
-            <div class="mx-auto max-w-7xl sm:px-6 lg:px-8">
+            <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
                 <div class="overflow-hidden bg-white shadow-sm sm:rounded-lg">
                     <div class="text-gray-900">
-                        <table class="table-auto w-full">
-                            <thead>
-                                <tr class="bg-gray-200 ">
-                                    <th>#</th>
-                                    <th>Item</th>
-                                    <th>Descrição</th>
-                                    <th>Valor ofertado</th>
-                                    <th>Valor estimado (gastos)</th>
-                                    <th>Status</th>
-                                </tr>
-                            </thead>
-                            <tbody class="">
-                                <tr @click="verFicha(list.id)" class="cursor-pointer" v-for="list in lista" :key="list.id">
-                                    <td><i class="material-icons">folder_open</i></td>
-                                    <td>{{list.produto}}</td>
-                                    <td>{{list.descricao}}</td>
-                                    <td>{{list.valor}}</td>
-                                    <td>{{list.valorEstimado}}</td>
-                                    <td>{{status[list.status]}}</td>
-                                </tr>
-                            </tbody>
-                        </table>
+                        <!-- Tabela responsiva -->
+                        <div class="overflow-x-auto">
+                            <table class="table-auto w-full text-sm">
+                                <thead>
+                                    <tr class="bg-gray-200">
+                                        <th class="px-2 py-1 text-left">#</th>
+                                        <th class="px-2 py-1 text-left">Item</th>
+                                        <th class="px-2 py-1 text-left">Descrição</th>
+                                        <th class="px-2 py-1 text-left">Valor ofertado</th>
+                                        <th class="px-2 py-1 text-left">Valor estimado (gastos)</th>
+                                        <th class="px-2 py-1 text-left">Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr @click="verFicha(list.id)" class="cursor-pointer hover:bg-gray-100" v-for="list in lista" :key="list.id">
+                                        <td class="px-2 py-1">
+                                            <i class="material-icons">folder_open</i>
+                                        </td>
+                                        <td class="px-2 py-1">{{ list.produto }}</td>
+                                        <td class="px-2 py-1">{{ list.descricao }}</td>
+                                        <td class="px-2 py-1">{{ list.valor }}</td>
+                                        <td class="px-2 py-1">{{ list.valorEstimado }}</td>
+                                        <td class="px-2 py-1">{{ status[list.status] }}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
     </AuthenticatedLayout>
 </template>
+
 
 <style scoped>
 

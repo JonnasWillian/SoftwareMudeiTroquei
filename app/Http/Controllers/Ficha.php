@@ -14,17 +14,17 @@ class Ficha extends Controller
     {
         $path = '';
         if ($request->hasFile('foto1')) {
-            $path = $request->file('foto1')->store('itens', 'public');
+            $path = base64_encode(file_get_contents($request->file('foto1')));
         }
 
         $path2 = '';
         if ($request->hasFile('foto2')) {
-            $path2 = $request->file('foto2')->store('itens', 'public');
+            $path2 =  base64_encode(file_get_contents($request->file('foto2')));
         }
 
         $path3 = '';
         if ($request->hasFile('foto3')) {
-            $path3 = $request->file('foto3')->store('itens', 'public');
+            $path3 = base64_encode(file_get_contents($request->file('foto3')));
         }
 
         $valorEstimado = $request->valor;

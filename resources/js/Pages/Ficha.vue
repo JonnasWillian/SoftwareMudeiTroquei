@@ -139,6 +139,16 @@
             console.log("Erro ao enviar o formulário:", error);
         }
     };
+
+    const getImageType = (base64String) => {
+    // Identifica o tipo pelo prefixo, se disponível
+    if (base64String.startsWith("/9j")) return "image/jpeg";
+    if (base64String.startsWith("iVBORw0KGgo")) return "image/png";
+    if (base64String.startsWith("R0lGODdh")) return "image/gif";
+
+    console.error("Tipo de imagem desconhecido.");
+    return null;
+    }
 </script>
 
 <template>
@@ -165,22 +175,22 @@
                                 <div class="flex justify-center">
                                     <img
                                         v-if="list.foto1"
-                                        :src="`/storage/${list.foto1}`"
+                                        :src="`data:${getImageType(list.foto1)};base64,${list.foto1}`"
                                         alt="Foto 1"
                                         class="rounded-lg w-1/2 h-100 object-cover transition-all ease-in-out"
                                     />
                                     <img
                                         v-if="list.foto2 && currentIndex[list.id] === 1"
-                                        :src="`/storage/${list.foto2}`"
+                                        :src="`data:${getImageType(list.foto2)};base64,${list.foto2}`"
                                         alt="Foto 2"
                                         class="rounded-lg w-1/2 h-100 object-cover transition-all ease-in-out"
                                     />
-                                    <!--img
+                                    <img
                                         v-if="list.foto3 && currentIndex[list.id] === 2"
-                                        :src="`/storage/${list.foto3}`"
+                                        :src="`data:${getImageType(list.foto3)};base64,${list.foto3}`"
                                         alt="Foto 3"
                                         class="rounded-lg w-1/2 h-80 object-cover transition-all ease-in-out"
-                                    />-->
+                                    />
                                 </div>
                             </div>
 
