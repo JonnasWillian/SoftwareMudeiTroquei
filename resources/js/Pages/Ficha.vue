@@ -23,10 +23,10 @@
             lista.value = response.data;
             console.log('lista', lista.value);
 
-            const valor = Number(lista.value[0].valor); // Converte para número
+            const valor = Number(lista.value[0].valorEstimado); // Converte para número
             demandaMedia.value = (valor + valor * 0.05).toFixed(2); // Calcula e retorna formatado
 
-            const valorAlta = Number(lista.value[0].valor); // Converte para número
+            const valorAlta = Number(lista.value[0].valorEstimado); // Converte para número
             demandaAlta.value = (valorAlta + valorAlta * 0.10).toFixed(2); // Calcula e retorna formatado
 
             statusAtual.value = lista.value[0].status
@@ -49,6 +49,62 @@
     const resposta = [];
     resposta["0"]= 'Não';
     resposta["1"]= 'Sim';
+
+    const freteBairro = [];
+        freteBairro["1"] = '42.5';
+        freteBairro["2"] = '65.0';
+        freteBairro["3"] = '60.0';
+        freteBairro["4"] = '55.0';
+        freteBairro["5"] = '37.5';
+        freteBairro["6"] = '37.5';
+        freteBairro["7"] = '42.5';
+        freteBairro["8"] = '42.5';
+        freteBairro["9"] = '50.0';
+        freteBairro["10"] = '37.5';
+        freteBairro["11"] = '55.0';
+        freteBairro["12"] = '50.0';
+        freteBairro["13"] = '60.0';
+        freteBairro["14"] = '65.0';
+        freteBairro["16"] = '65.0';
+        freteBairro["17"] = '60.0';
+        freteBairro["18"] = '80.0';
+        freteBairro["19"] = '75.0';
+        freteBairro["20"] = '85.0';
+        freteBairro["21"] = '90.0';
+        freteBairro["22"] = '90.0';
+        freteBairro["23"] = '95.0';
+        freteBairro["24"] = '105.0';
+        freteBairro["25"] = '100.0';
+        freteBairro["26"] = '95.0';
+        freteBairro["27"] = '105.0';
+        freteBairro["28"] = '110.0';
+        freteBairro["29"] = '112.5';
+        freteBairro["30"] = '105.0';
+        freteBairro["31"] = '100.0';
+        freteBairro["32"] = '100.0';
+        freteBairro["33"] = '105.0';
+        freteBairro["34"] = '100.0';
+        freteBairro["35"] = '105.0';
+        freteBairro["36"] = '95.0';
+        freteBairro["37"] = '100.0';
+        freteBairro["38"] = '100.0';
+        freteBairro["39"] = '100.0';
+        freteBairro["40"] = '120.0';
+        freteBairro["41"] = '105.0';
+        freteBairro["42"] = '100.0';
+        freteBairro["43"] = '90.0';
+        freteBairro["44"] = '65.0';
+        freteBairro["45"] = '85.0';
+        freteBairro["46"] = '90.0';
+        freteBairro["47"] = '105.0';
+        freteBairro["48"] = '160.0';
+        freteBairro["49"] = '180.0';
+        freteBairro["50"] = '140.0';
+        freteBairro["51"] = '150.0';
+        freteBairro["52"] = '90.0';
+        freteBairro["53"] = '85.0';
+        freteBairro["54"] = '85.0';
+    freteBairro["55"] = '95.0';
 
     const bairros = [];
         bairros["1"]= 'Barra da Tijuca';
@@ -149,6 +205,15 @@
     console.error("Tipo de imagem desconhecido.");
     return null;
     }
+
+    const processarFrete = (valor) => {
+        if (!valor) return;
+        // Divide a string no delimitador "-"
+        const partes = valor.split('-');
+
+        // Retorna a segunda parte com trim, se existir
+        return partes[1] ? partes[1].trim() : '';
+    };
 </script>
 
 <template>
@@ -220,14 +285,22 @@
                             <ul>
                                 <li><strong>Quantidade:</strong> {{ list.quantidade }}</li>
                                 <li><strong>Valor ofertado:</strong> {{ list.valor }}</li>
-                                <li><strong>Valor estimado (gastos): </strong> {{ list.valorEstimado }}</li>
+                                <li><strong>Valor estimado (gastos): </strong> {{ list.valorEstimado }}
+                                    <br>
+                                    <span class="text-red-600" v-if="list.desmontage == 'Sim'">Custo deduzido: desmontagem - 50</span>
+                                    <span class="text-red-600" v-if="list.sujo == 'Sim'">Custo deduzido: limpeza - 30</span>
+                                    <span class="text-red-600" v-if="list.bairro != null">Custo deduzido: frete - {{ freteBairro[list.bairro] }}</span>
+                                    <span class="text-red-600" v-if="list.outroBairro">Custo deduzido de outro bairro: - {{ processarFrete(list.outroBairro) }}</span>
+                                </li>
                                 <li><strong>Valor comercial (google): </strong> {{  }}</li>
                             </ul>
 
                             <ul>
-                                <li class="text-green-500"><strong>Demanda Baixa:</strong> {{ list.valor }}</li>   
+                                <br><hr>
+                                <li class="text-green-500"><strong>Demanda Baixa:</strong> {{ list.valorEstimado }}</li>   
                                 <li class="text-orange-400"><strong>Demanda Média:</strong> {{ demandaMedia }}</li>
                                 <li class="text-red-600"><strong>Demanda Alta:</strong> {{ demandaAlta }}</li>
+                                <hr><br>
                             </ul>
                             </div>
 
