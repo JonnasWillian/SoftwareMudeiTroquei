@@ -292,7 +292,7 @@
                                     <span class="text-red-600" v-if="list.bairro != null">Custo deduzido: frete - {{ freteBairro[list.bairro] }}</span>
                                     <span class="text-red-600" v-if="list.outroBairro">Custo deduzido de outro bairro: - {{ processarFrete(list.outroBairro) }}</span>
                                 </li>
-                                <li><strong>Valor comercial (google): </strong> {{  }}</li>
+                                <li class="text-amber-600"><strong>Valor comercial (google): </strong> {{ list.urgente }}</li>
                             </ul>
 
                             <ul>
