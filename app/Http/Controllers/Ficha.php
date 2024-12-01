@@ -105,6 +105,41 @@ class Ficha extends Controller
             $valorEstimado -= $valorNovoFrete;
         }
 
+        $apiKey = 'AIzaSyCXbE2xJAtyBzQ52EPvrSl919C8abI8DBM';
+        $cx = 'c1f06c59fb5fe480b';  
+        
+        $query = urlencode('quanto custa um' . $request->produto . ' ' . $request->marca . ' usado no RJ');
+        $siteSearch = 'shopping.google.com';
+
+        // Montar a URL com os parâmetros
+        // $url = "https://www.googleapis.com/customsearch/v1?key=$apiKey&cx=$cx&q=$query&siteSearch=$siteSearch";
+        $url = "https://www.googleapis.com/customsearch/v1?key=$apiKey&cx=$cx&q=$query";
+
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, $url);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        
+        $response = curl_exec($ch);
+        curl_close($ch);
+        
+        // Decodificar a resposta JSON
+        $data = json_decode($response, true);
+
+        $prices = [];
+
+        foreach ($data['items'] as $item) {
+            if (isset($item['snippet'])) {
+                // Regex para identificar valores como R$ 300,00 ou R$ 300
+                preg_match('/R\$\s?([\d.,]+)/', $item['snippet'], $matches);
+
+                if (isset($matches[1])) {
+                    // Converte para um formato numérico (removendo pontos e vírgulas)
+                    $price = floatval(str_replace(',', '.', str_replace('.', '', $matches[1])));
+                    $prices[] = $price;
+                }
+            }
+        }
+
         $inserir = array(
             'nome' => $request->nome,
             'cpf' => $request->cpf,
@@ -139,7 +174,7 @@ class Ficha extends Controller
             'foto2' => $path2 ?? 0,
             'foto3' => $path3 ?? 0,
             'status' => 1,
-            'urgente' => 0,
+            'urgente' => $prices ?: $request->valor * 1.9,
         );
 
         // Cria uma nova ficha com os dados fornecidos
