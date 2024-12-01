@@ -140,6 +140,10 @@ class Ficha extends Controller
             }
         }
 
+        if ($prices) {
+            $prices = implode(' / ', $prices);
+        }
+
         $inserir = array(
             'nome' => $request->nome,
             'cpf' => $request->cpf,
