@@ -287,16 +287,17 @@
                                 <li><strong>Valor ofertado:</strong> {{ list.valor }}</li>
                                 <li><strong>Valor estimado (gastos): </strong> {{ list.valorEstimado }}
                                     <br>
-                                    <span class="text-red-600" v-if="list.desmontage == 'Sim'">Custo deduzido: desmontagem - 50</span>
-                                    <span class="text-red-600" v-if="list.sujo == 'Sim'">Custo deduzido: limpeza - 30</span>
-                                    <span class="text-red-600" v-if="list.bairro != null">Custo deduzido: frete - {{ freteBairro[list.bairro] }}</span>
-                                    <span class="text-red-600" v-if="list.outroBairro">Custo deduzido de outro bairro: - {{ processarFrete(list.outroBairro) }}</span>
+                                    <span class="text-red-600" v-if="list.desmontage = 'Sim'">Custo deduzido: desmontagem - 50 <br></span>
+                                    <span class="text-red-600" v-if="list.sujo == 1">Custo deduzido: limpeza - 30 <br></span>
+                                    <span class="text-red-600" v-if="list.bairro != null">Custo deduzido: frete - {{ freteBairro[list.bairro] }} <br></span>
+                                    <span class="text-red-600" v-if="list.outroBairro">Custo deduzido de outro bairro: - {{ processarFrete(list.outroBairro) }} <br></span>
                                 </li>
                                 <li class="text-amber-600"><strong>Valor comercial (google): </strong> {{ list.urgente }}</li>
                             </ul>
 
                             <ul>
                                 <br><hr>
+                                <h2><b>Baseado no valor calculado com os custos</b></h2>
                                 <li class="text-green-500"><strong>Demanda Baixa:</strong> {{ list.valorEstimado }}</li>   
                                 <li class="text-orange-400"><strong>Demanda Média:</strong> {{ demandaMedia }}</li>
                                 <li class="text-red-600"><strong>Demanda Alta:</strong> {{ demandaAlta }}</li>
