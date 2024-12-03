@@ -27,14 +27,14 @@ class Ficha extends Controller
             $path3 = base64_encode(file_get_contents($request->file('foto3')));
         }
 
-        $valorEstimado = $request->valor;
+        $valorEstimado = (float) $request->valor;
 
         if ($request->desmontagem == 'Sim') {
-            $valorEstimado -= 50;
+            $valorEstimado -= (float)  50.00;
         }
 
         if ($request->sujo == 'Sim') {
-            $valorEstimado -= 30;
+            $valorEstimado -= (float)  30.00;
         }
 
         if ($request->bairro != null) {
@@ -95,14 +95,14 @@ class Ficha extends Controller
             "55" => '95.0',
            ];
 
-           $valorEstimado -= $freteBairro[$request->bairro];
+           $valorEstimado -= (float)  $freteBairro[$request->bairro];
         }
 
         if ($request->outroBairro) {
             $valorFreteNovo = explode('-', $request->outroBairro);
             $valorNovoFrete = trim($parts[1]);
 
-            $valorEstimado -= $valorNovoFrete;
+            $valorEstimado -= (float) $valorNovoFrete;
         }
 
         $apiKey = 'AIzaSyCXbE2xJAtyBzQ52EPvrSl919C8abI8DBM';
@@ -152,7 +152,7 @@ class Ficha extends Controller
             'produto' => $request->produto,
             'marca' => $request->marca,
             'dtCompra' => $request->dtCompra,
-            'valor' => $request->valor,
+            'valor' => (float) $request->valor,
             'valorEstimado' => $valorEstimado,
             'marcaUso' => $request->marcaUso,
             'descricao' => $request->descricao,
