@@ -224,6 +224,7 @@
                 <button class="absolute left-14 top-1/10 transform -translate-y-1/2 bg-gray-200 p-2 rounded-full" @click="prevImage(list.id)">&#8592; Voltar</button>
             </Link>
             <div class="mx-auto max-w-7xl sm:px-6 lg:px-8">
+                
                 <div class="overflow-hidden bg-white shadow-sm sm:rounded-lg p-6">
                     <!-- Itens em formato de cards -->
                     <div class="w-full   ">
@@ -284,15 +285,18 @@
 
                             <ul>
                                 <li><strong>Quantidade:</strong> {{ list.quantidade }}</li>
-                                <li><strong>Valor ofertado:</strong> {{ list.valor }}</li>
-                                <li><strong>Valor estimado (gastos): </strong> {{ list.valorEstimado }}
-                                    <br>
+                                <li><strong>Valor ofertado (oferta do cliente):</strong> {{ list.valor }}</li>
+                                <li>
                                     <span class="text-red-600" v-if="list.desmontage = 'Sim'">Custo deduzido: desmontagem - 50 <br></span>
                                     <span class="text-red-600" v-if="list.sujo == 1">Custo deduzido: limpeza - 30 <br></span>
                                     <span class="text-red-600" v-if="list.bairro != null">Custo deduzido: frete - {{ freteBairro[list.bairro] }} <br></span>
                                     <span class="text-red-600" v-if="list.outroBairro">Custo deduzido de outro bairro: - {{ processarFrete(list.outroBairro) }} <br></span>
+                                    <hr>
+                                    <strong>Valor estimado (oferta do cliente - custos): </strong> {{ list.valorEstimado }}
                                 </li>
-                                <li class="text-amber-600"><strong>Valor comercial (google): </strong> {{ list.urgente }}</li>
+                                <li class="text-amber-600"><strong>Valor comercial (valor dogoogle): </strong> {{ list.urgente }}</li>
+                                <li class="text-amber-600"><strong>Valor para venda (50% do valor do google): </strong> {{ list.urgente * 0.5 }}</li>
+                                <li class="text-green-500"><strong>Lucro </strong> {{ list.urgente * 0.5 }} - ( {{ list.valorEstimado }} - custos ) = {{ (list.urgente * 0.5) - list.valorEstimado - (list.valor - list.valorEstimado) }}</li>
                             </ul>
 
                             <ul>
