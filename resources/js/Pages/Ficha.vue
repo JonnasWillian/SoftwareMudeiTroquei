@@ -7,6 +7,8 @@
 
     const id = JSON.parse(localStorage.getItem('id'));
     const lista = ref([]); 
+    const linksProduto = ref([]); 
+    const fotosProduto = ref([]); 
     const demandaMedia = ref('');
     const demandaAlta = ref('');
     const currentIndex = ref({}); // Armazena o índice da imagem para cada item
@@ -21,7 +23,8 @@
         try {
             const response = await axios.get(`/fichaView/${id}`);
             lista.value = response.data;
-            console.log('lista', lista.value);
+            fotosProduto.value = lista.value[0].fotosProduto.split(" spaceItem ");
+            linksProduto.value = lista.value[0].linksProduto.split(" spaceItem ");
 
             const valor = Number(lista.value[0].valorEstimado); // Converte para número
             demandaMedia.value = (valor + valor * 0.05).toFixed(2); // Calcula e retorna formatado
@@ -349,6 +352,26 @@
                                             </div>
                                         </li>
                                     </form>
+                                </ul>
+                            </div>
+
+                            <h3 class="text-lg font-semibold text-gray-700 mt-4 mb-2">Fonte dos dados</h3>
+                            <div class="grid grid-cols-1 sm:grid-cols-3 text-sm text-gray-600">
+                                <!-- 
+                                    fotosProduto.value = lista.value[0].fotosProduto.split(" spaceItem ");
+                                    linksProduto.value = lista.value[0].linksProduto.split(" spaceItem ");
+                                 -->
+                                 {{ console.log('key', list.id) }}
+                                <ul v-for="(foto, index) in fotosProduto" :key="index" >
+                                    <li>
+                                        <a :href="`${linksProduto[index]}`" target="_blank">
+                                            <img
+                                                :src="`${foto}`"
+                                                alt="Foto 1"
+                                                class="rounded-lg h-100 object-cover transition-all ease-in-out p-10"
+                                            />
+                                        </a>
+                                    </li>
                                 </ul>
                             </div>
                         </div>
