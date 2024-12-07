@@ -46,5 +46,7 @@ class ficha extends Model
         'status',
         'cpf',
         'urgente',
+        'linksProduto',
+        'fotosProduto',
     ];
 }

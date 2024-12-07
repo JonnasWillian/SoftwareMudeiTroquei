@@ -28,13 +28,15 @@ return new class extends Migration
             $table->decimal('altura', 12, 2);
             $table->decimal('largura', 12, 2);
             $table->decimal('profundidade', 12, 2);
-            $table->string('foto1');
-            $table->string('foto2');
-            $table->string('foto3');
+            $table->longText('foto1');
+            $table->longText('foto2');
+            $table->longText('foto3');
             $table->string('status');
             $table->string('urgente');
             $table->decimal('quantidade', 12, 2);
             $table->string('outroBairro')->nullable();
+            $table->longText('linksProduto')->nullable();
+            $table->longText('fotosProduto')->nullable();
             $table->string('voltagem');
             $table->string('cpf');
             // Flags
