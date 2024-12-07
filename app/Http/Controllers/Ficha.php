@@ -105,14 +105,69 @@ class Ficha extends Controller
             $valorEstimado -= (float) $valorNovoFrete;
         }
 
+        // Teste
+        $serviceAccountPath = base_path('public/image/apiKey.json');
+        $serviceAccount = json_decode(file_get_contents($serviceAccountPath), true);
+        // $apiKey = json_decode(file_get_contents($serviceAccountPath));
+        // dd($serviceAccount);
+        $apiKey = $serviceAccount['private_key'] ?? null;
+        $apiKey = 'AIzaSyCXbE2xJAtyBzQ52EPvrSl919C8abI8DBM';
+
+        $imageData = $path ? $path : ($path2 ? $path2 : $path3);
+
+        $url = "https://vision.googleapis.com/v1/images:annotate?key=$apiKey";
+
+        $payload = [
+            'requests' => [
+                [
+                    'image' => ['content' => $imageData],
+                    'features' => [
+                        ['type' => 'LABEL_DETECTION', 'maxResults' => 5], // Etiquetas
+                        ['type' => 'TEXT_DETECTION', 'maxResults' => 5], // Texto
+                    ],
+                ],
+            ],
+        ];
+
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, $url);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_POST, true);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, ['Content-Type: application/json']);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($payload));
+
+        $response = curl_exec($ch);
+
+        if ($response === false) {
+            $error = curl_error($ch);
+            $info = curl_getinfo($ch);
+            curl_close($ch);
+
+            dd('Erro ao executar cURL', $error, $info);
+        }
+        curl_close($ch);
+        
+        $apiResponse = json_decode($response, true);
+        $labels = [];
+        if (isset($apiResponse['responses'][0]['labelAnnotations'])) {
+            foreach ($apiResponse['responses'][0]['labelAnnotations'] as $annotation) {
+                $labels[] = $annotation['description'];
+            }
+        }
+
+        dd('teste API', $response);
+        // Fim teste
+
         $apiKey = 'AIzaSyCXbE2xJAtyBzQ52EPvrSl919C8abI8DBM';
         $cx = 'c1f06c59fb5fe480b';  
         
-        $query = urlencode('quanto custa um' . $request->produto . ' ' . $request->marca . ' usado no RJ');
-        $siteSearch = 'shopping.google.com';
-
+        $query = urlencode('valores de ' . $request->produto . ' ' . $request->marca . ' me retorne apenas os produtos');
+        
         // Montar a URL com os parâmetros
-        // $url = "https://www.googleapis.com/customsearch/v1?key=$apiKey&cx=$cx&q=$query&siteSearch=$siteSearch";
+        /*
+            $siteSearch = 'shopping.google.com';
+            $url = "https://www.googleapis.com/customsearch/v1?key=$apiKey&cx=$cx&q=$query&siteSearch=$siteSearch";
+        */
         $url = "https://www.googleapis.com/customsearch/v1?key=$apiKey&cx=$cx&q=$query";
 
         $ch = curl_init();
@@ -121,11 +176,14 @@ class Ficha extends Controller
         
         $response = curl_exec($ch);
         curl_close($ch);
-        
-        // Decodificar a resposta JSON
+
         $data = json_decode($response, true);
 
         $prices = [];
+        $liks = [];
+        $fotos = [];
+
+        dd('Teste pesquisa', $data);
 
         foreach ($data['items'] as $item) {
             if (isset($item['snippet'])) {
@@ -138,10 +196,22 @@ class Ficha extends Controller
                     $prices[] = $price;
                 }
             }
+            if (isset($item['pagemap'])) {
+                $liks[] = $item['link'];
+                $fotos[] = $item['pagemap']['cse_image'][0]['src'];
+            }
         }
-
+        
         if ($prices) {
             $prices = implode(' / ', $prices);
+        }
+
+        if ($liks) {
+            $liks = implode(' spaceItem ', $liks);
+        }
+
+        if ($fotos) {
+            $fotos = implode(' spaceItem ', $fotos);
         }
 
         $inserir = array(
@@ -179,6 +249,8 @@ class Ficha extends Controller
             'foto3' => $path3 ?? 0,
             'status' => 1,
             'urgente' => $prices ?: $request->valor * 1.9,
+            'linksProduto' => $liks,
+            'fotosProduto' => $fotos,
         );
 
         // Cria uma nova ficha com os dados fornecidos
