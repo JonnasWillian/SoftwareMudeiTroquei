@@ -13,6 +13,7 @@
     const demandaAlta = ref('');
     const currentIndex = ref({}); // Armazena o índice da imagem para cada item
     const statusAtual = ref('');
+    const calculoGoogle = ref('');
     const status = [];
     status[1] = "Em analise";
     status[2] = "Aprovados";
@@ -25,6 +26,8 @@
             lista.value = response.data;
             fotosProduto.value = lista.value[0].fotosProduto.split(" spaceItem ");
             linksProduto.value = lista.value[0].linksProduto.split(" spaceItem ");
+            calculoGoogle.value = lista.value[0].urgente.split(" / ");
+            calculoGoogle.value = calculoGoogle.value[0] * 0.5;
 
             const valor = Number(lista.value[0].valorEstimado); // Converte para número
             demandaMedia.value = (valor + valor * 0.05).toFixed(2); // Calcula e retorna formatado
@@ -298,8 +301,8 @@
                                     <strong>Valor estimado (oferta do cliente - custos): </strong> {{ list.valorEstimado }}
                                 </li>
                                 <li class="text-amber-600"><strong>Valor comercial (valor dogoogle): </strong> {{ list.urgente }}</li>
-                                <li class="text-amber-600"><strong>Valor para venda (50% do valor do google): </strong> {{ list.urgente * 0.5 }}</li>
-                                <li class="text-green-500"><strong>Lucro </strong> {{ list.urgente * 0.5 }} - ( {{ list.valorEstimado }} - custos ) = {{ (list.urgente * 0.5) - list.valorEstimado - (list.valor - list.valorEstimado) }}</li>
+                                <li class="text-amber-600"><strong>Valor para venda (50% do valor do google): </strong> {{ calculoGoogle }}</li>
+                                <li class="text-green-500"><strong>Lucro </strong> {{ calculoGoogle }} - ( {{ list.valorEstimado }} - custos ) = {{ (calculoGoogle) - list.valorEstimado - (list.valor - list.valorEstimado) }}</li>
                             </ul>
 
                             <ul>
@@ -357,11 +360,6 @@
 
                             <h3 class="text-lg font-semibold text-gray-700 mt-4 mb-2">Fonte dos dados</h3>
                             <div class="grid grid-cols-1 sm:grid-cols-3 text-sm text-gray-600">
-                                <!-- 
-                                    fotosProduto.value = lista.value[0].fotosProduto.split(" spaceItem ");
-                                    linksProduto.value = lista.value[0].linksProduto.split(" spaceItem ");
-                                 -->
-                                 {{ console.log('key', list.id) }}
                                 <ul v-for="(foto, index) in fotosProduto" :key="index" >
                                     <li>
                                         <a :href="`${linksProduto[index]}`" target="_blank">
