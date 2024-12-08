@@ -9,7 +9,6 @@ use App\Models\ficha AS FichaFomulario;
 
 class Ficha extends Controller
 {
-    //
     public function store(Request $request)
     {
         $path = '';
@@ -105,105 +104,37 @@ class Ficha extends Controller
             $valorEstimado -= (float) $valorNovoFrete;
         }
 
-        $serviceAccountPath = base_path('public/image/apiKey.json');
-        $serviceAccount = json_decode(file_get_contents($serviceAccountPath), true);
-        // $apiKey = json_decode(file_get_contents($serviceAccountPath));
-        // dd($serviceAccount);
-        $apiKey = $serviceAccount['private_key'] ?? null;
-        $apiKey = 'AIzaSyCXbE2xJAtyBzQ52EPvrSl919C8abI8DBM';
-
         $imageData = $path ? $path : ($path2 ? $path2 : $path3);
-
-        $url = "https://vision.googleapis.com/v1/images:annotate?key=$apiKey";
-
-        $payload = [
-            'requests' => [
-                [
-                    'image' => ['content' => $imageData],
-                    'features' => [
-                        ['type' => 'WEB_DETECTION','maxResults' => 100],
-                    ],
-                ],
-            ],
-        ];
-
-        $ch = curl_init();
-        curl_setopt($ch, CURLOPT_URL, $url);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($ch, CURLOPT_POST, true);
-        curl_setopt($ch, CURLOPT_HTTPHEADER, ['Content-Type: application/json']);
-        curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($payload));
-
-        $response = curl_exec($ch);
-
-        if ($response === false) {
-            $error = curl_error($ch);
-            $info = curl_getinfo($ch);
-            curl_close($ch);
-        }
-        curl_close($ch);
         
-        $apiResponse = json_decode($response, true);
-        $descriptions = [];
-        if (isset($apiResponse['responses'][0]['webDetection']['webEntities'])) {
-            foreach ($apiResponse['responses'][0]['webDetection']['webEntities'] as $entity) {
-                $descriptions[] = $entity['description']; // Armazena as descrições encontradas
-            }
-        }
-        $descriptions[] = 'R$ / valor em real';
-
-        $apiKey = 'AIzaSyCXbE2xJAtyBzQ52EPvrSl919C8abI8DBM';
-        $cx = 'c1f06c59fb5fe480b';  
-        
-        $urlCustomSearch = "https://www.googleapis.com/customsearch/v1?key=$apiKey&cx=$cx&q=" . urlencode(implode(' ', $descriptions));
-
-        $chCustomSearch = curl_init();
-        curl_setopt($chCustomSearch, CURLOPT_URL, $urlCustomSearch);
-        curl_setopt($chCustomSearch, CURLOPT_RETURNTRANSFER, true);
-
-        $responseCustomSearch = curl_exec($chCustomSearch);
-
-        if ($responseCustomSearch === false) {
-            $error = curl_error($chCustomSearch);
-            $info = curl_getinfo($chCustomSearch);
-            curl_close($chCustomSearch);
-
-            dd('Erro ao executar cURL no Google Custom Search API', $error, $info);
-        }
-
-        curl_close($chCustomSearch);
-
-        $apiResponseCustomSearch = json_decode($responseCustomSearch, true);
+        $apiResponseCustomSearch = $this->pesquisarItem($imageData);
 
         $prices = [];
         $liks = [];
         $fotos = [];
-        $teste = [];
 
         // Exibir resultados ou processar conforme necessário
-        if (isset($apiResponseCustomSearch['items'])) {
-            foreach ($apiResponseCustomSearch['items']as $item) {
-                if (isset($item['snippet'])) {
-                    // Regex para identificar valores como R$ 300,00 ou R$ 300
-                    preg_match('/R\$\s?([\d.,]+)/', $item['snippet'], $matches);
-                    $teste[] = $item['snippet'];
-    
-                    if (isset($matches[1])) {
-                        // Converte para um formato numérico (removendo pontos e vírgulas)
-                        $price = floatval(str_replace(',', '.', str_replace('.', '', $matches[1])));
-                        $prices[] = $price;
-                    }
+        if (!isset($apiResponseCustomSearch['items'])) {
+            $apiResponseCustomSearch = $this->pesquisarItem($imageData);
+        }
+
+        foreach ($apiResponseCustomSearch['items']as $item) {
+            if (isset($item['snippet'])) {
+                // Regex para identificar valores como R$ 300,00 ou R$ 300
+                preg_match('/R\$\s?([\d.,]+)/', $item['snippet'], $matches);
+
+                if (isset($matches[1])) {
+                    // Converte para um formato numérico (removendo pontos e vírgulas)
+                    $price = floatval(str_replace(',', '.', str_replace('.', '', $matches[1])));
+                    $prices[] = $price;
                 }
-                if (isset($item['pagemap'])) {
-                    if (strpos($item['pagemap']['cse_image'][0]['src'], 'logo') == false) {
-                        $liks[] = $item['link'];
-                        $fotos[] = $item['pagemap']['cse_image'][0]['src'];
-                    }
+            }
+            if (isset($item['pagemap'])) {
+                if (strpos($item['pagemap']['cse_image'][0]['src'], 'logo') == false) {
+                    $liks[] = $item['link'];
+                    $fotos[] = $item['pagemap']['cse_image'][0]['src'];
                 }
             }
         }
-
-        dd('teste API', $liks, $fotos, $prices, $teste);
 
         if ($prices) {
             $prices = implode(' / ', $prices);
@@ -258,6 +189,71 @@ class Ficha extends Controller
 
         // Cria uma nova ficha com os dados fornecidos
         FichaFomulario::create($inserir);
+    }
+
+    public function pesquisarItem($imageData)
+    {
+        $apiKey = env('APP_KEY_GOOGLE');
+
+        $url = "https://vision.googleapis.com/v1/images:annotate?key=$apiKey";
+
+        $payload = [
+            'requests' => [
+                [
+                    'image' => ['content' => $imageData],
+                    'features' => [
+                        ['type' => 'WEB_DETECTION','maxResults' => 100],
+                    ],
+                ],
+            ],
+        ];
+
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, $url);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_POST, true);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, ['Content-Type: application/json']);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($payload));
+
+        $response = curl_exec($ch);
+
+        if ($response === false) {
+            $error = curl_error($ch);
+            $info = curl_getinfo($ch);
+            curl_close($ch);
+        }
+        curl_close($ch);
+        
+        $apiResponse = json_decode($response, true);
+        $descriptions = [];
+        if (isset($apiResponse['responses'][0]['webDetection']['webEntities'])) {
+            foreach ($apiResponse['responses'][0]['webDetection']['webEntities'] as $entity) {
+                $descriptions[] = $entity['description']; // Armazena as descrições encontradas
+            }
+        }
+        $descriptions[] = 'R$ / valor em real';
+
+        $cx = env('CX'); 
+        
+        $urlCustomSearch = "https://www.googleapis.com/customsearch/v1?key=$apiKey&cx=$cx&q=" . urlencode(implode(' ', $descriptions));
+
+        $chCustomSearch = curl_init();
+        curl_setopt($chCustomSearch, CURLOPT_URL, $urlCustomSearch);
+        curl_setopt($chCustomSearch, CURLOPT_RETURNTRANSFER, true);
+
+        $responseCustomSearch = curl_exec($chCustomSearch);
+
+        if ($responseCustomSearch === false) {
+            $error = curl_error($chCustomSearch);
+            $info = curl_getinfo($chCustomSearch);
+            curl_close($chCustomSearch);
+        }
+
+        curl_close($chCustomSearch);
+
+        $apiResponseCustomSearch = json_decode($responseCustomSearch, true);
+
+        return $apiResponseCustomSearch;
     }
 
     public function list($statusId)
