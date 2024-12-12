@@ -293,7 +293,7 @@
                                 <li><strong>Quantidade:</strong> {{ list.quantidade }}</li>
                                 <li><strong>Valor ofertado (oferta do cliente):</strong> {{ list.valor }}</li>
                                 <li>
-                                    <span class="text-red-600" v-if="list.desmontage = 'Sim'">Custo deduzido: desmontagem - 50 <br></span>
+                                    <span class="text-red-600" v-if="list.desmontagem == 1">Custo deduzido: desmontagem - 50 <br></span>
                                     <span class="text-red-600" v-if="list.sujo == 1">Custo deduzido: limpeza - 30 <br></span>
                                     <span class="text-red-600" v-if="list.bairro != null">Custo deduzido: frete - {{ freteBairro[list.bairro] }} <br></span>
                                     <span class="text-red-600" v-if="list.outroBairro">Custo deduzido de outro bairro: - {{ processarFrete(list.outroBairro) }} <br></span>
@@ -324,7 +324,7 @@
                                     <li><strong>Largura:</strong> {{ list.largura }} cm</li>
                                     <li><strong>Profundidade:</strong> {{ list.profundidade }} cm</li>
                                     <li><strong>Estado:</strong> {{ list.tipoEstado }}</li>
-                                    <li><strong>Desmontagem:</strong> {{ list.desmontagem }}</li>
+                                    <li><strong>Desmontagem:</strong> {{ resposta[list.desmontagem] }}</li>
                                     <li><strong>Marca de Uso:</strong> {{ list.marcaUso }}</li>
                                     <li><strong>Novo:</strong> {{ resposta[list.novo] }}</li>
                                 </ul>

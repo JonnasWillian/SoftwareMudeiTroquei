@@ -171,6 +171,10 @@
             console.log("Erro ao enviar o formulário:", error);
         }
     };
+
+    setTimeout(() => {
+        window.location.href = '/';
+    }, 8 * 60 * 1000);
 </script>
 
 <template>

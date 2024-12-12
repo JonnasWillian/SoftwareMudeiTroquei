@@ -129,9 +129,11 @@ class Ficha extends Controller
                 }
             }
             if (isset($item['pagemap'])) {
-                if (strpos($item['pagemap']['cse_image'][0]['src'], 'logo') == false) {
-                    $liks[] = $item['link'];
-                    $fotos[] = $item['pagemap']['cse_image'][0]['src'];
+                if (isset($item['pagemap']['cse_image'])) {
+                    if (strpos($item['pagemap']['cse_image'][0]['src'], 'logo') == false) {
+                        $liks[] = $item['link'];
+                        $fotos[] = $item['pagemap']['cse_image'][0]['src'];
+                    }
                 }
             }
         }
@@ -172,12 +174,12 @@ class Ficha extends Controller
             'usado' => $request->usado ? 1 : 0,
             'troca' => $request->troca ? 1 : 0,
             'nf' => $request->nf,
-            'sujo' => $request->sujo ? 1 : 0,
+            'sujo' => $request->sujo == 'Sim' ? 1 : 0,
             'mofo' => $request->mofo ? 1 : 0,
             'cupim' => $request->cupim ? 1 : 0,
             'cpf' => $request->cpf,
             'trincado' => $request->trincado ? 1 : 0,
-            'desmontagem' => $request->desmontagem,
+            'desmontagem' => $request->desmontagem == 'Sim' ? 1 : 0,
             'foto1' => $path ?? 0,
             'foto2' => $path2 ?? 0,
             'foto3' => $path3 ?? 0,
@@ -202,7 +204,7 @@ class Ficha extends Controller
                 [
                     'image' => ['content' => $imageData],
                     'features' => [
-                        ['type' => 'WEB_DETECTION','maxResults' => 100],
+                        ['type' => 'WEB_DETECTION','maxResults' => 200],
                     ],
                 ],
             ],
@@ -228,7 +230,9 @@ class Ficha extends Controller
         $descriptions = [];
         if (isset($apiResponse['responses'][0]['webDetection']['webEntities'])) {
             foreach ($apiResponse['responses'][0]['webDetection']['webEntities'] as $entity) {
-                $descriptions[] = $entity['description']; // Armazena as descrições encontradas
+                if (isset($entity['description'])) {
+                    $descriptions[] = $entity['description']; // Armazena as descrições encontradas
+                }
             }
         }
         $descriptions[] = 'R$ / valor em real';
