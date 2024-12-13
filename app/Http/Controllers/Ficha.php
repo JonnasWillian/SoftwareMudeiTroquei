@@ -204,7 +204,7 @@ class Ficha extends Controller
                 [
                     'image' => ['content' => $imageData],
                     'features' => [
-                        ['type' => 'WEB_DETECTION','maxResults' => 200],
+                        ['type' => 'WEB_DETECTION','maxResults' => 100000],
                     ],
                 ],
             ],
