@@ -195,6 +195,7 @@ class Ficha extends Controller
 
     public function pesquisarItem($imageData)
     {
+        // 2fe679ca178b2259be213f90a3634de95de53d16bf4699bb6f68b2f7b252b001
         $apiKey = env('APP_KEY_GOOGLE');
 
         $url = "https://vision.googleapis.com/v1/images:annotate?key=$apiKey";
