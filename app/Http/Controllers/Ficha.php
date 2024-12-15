@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use GuzzleHttp\Client;
 
 // Models
 use App\Models\ficha AS FichaFomulario;
@@ -117,6 +118,8 @@ class Ficha extends Controller
             $apiResponseCustomSearch = $this->pesquisarItem($imageData);
         }
 
+        // dd($apiResponseCustomSearch);
+
         foreach ($apiResponseCustomSearch['items']as $item) {
             if (isset($item['snippet'])) {
                 // Regex para identificar valores como R$ 300,00 ou R$ 300
@@ -193,9 +196,87 @@ class Ficha extends Controller
         FichaFomulario::create($inserir);
     }
 
+    // Pesquisa pela serpapi com googleLens
+    public function searchWithGoogleLens($imageData)
+    {
+        try {
+            // Configuração da API
+            $apiKey = env('SERPAPI_KEY');
+            $apiUrl = 'https://serpapi.com/search?engine=google_lens';
+
+            // Envia o arquivo como upload multipart
+            $client = new Client();
+            
+            try {
+                $response = $client->request('GET', $apiUrl, [
+                    'multipart' => [
+                        [
+                            'name'     => 'engine',
+                            'contents' => 'google_lens'
+                        ],
+                        [
+                            'name'     => 'api_key',
+                            'contents' => $apiKey
+                        ],
+                        [
+                            'name'     => 'image_data',
+                            'contents' => $imageData,
+                        ]
+                    ]
+                ]);
+
+                // Decodifica a resposta
+                $responseBody = $response->getBody()->getContents();
+                $responseData = json_decode($responseBody, true);
+
+                // Log detalhado da resposta
+                \Log::info('SerpAPI Full Response', [
+                    'body' => $responseBody,
+                    'parsed_data' => $responseData
+                ]);
+
+                // Verifica se há resultados válidos
+                if ($responseData === null) {
+                    return response()->json([
+                        'error' => 'Resposta da API inválida',
+                        'raw_response' => $responseBody
+                    ], 500);
+                }
+
+                // Retorna o resultado
+                return response()->json($responseData);
+
+            } catch (\GuzzleHttp\Exception\RequestException $e) {
+                // Log do erro detalhado
+                \Log::error('SerpAPI Request Error', [
+                    'message' => $e->getMessage(),
+                    'response' => $e->getResponse() ? $e->getResponse()->getBody()->getContents() : 'No response',
+                    'full_url' => $e->getRequest()->getUri()->__toString()
+                ]);
+
+                return response()->json([
+                    'error' => 'Erro na requisição', 
+                    'details' => $e->getMessage(),
+                    'url' => $e->getRequest()->getUri()->__toString()
+                ], 500);
+            }
+        } catch (\Exception $e) {
+            // Log de qualquer outro erro
+            \Log::error('Erro geral', [
+                'message' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+
+            return response()->json([
+                'error' => 'Erro ao processar a imagem', 
+                'message' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    // Pesquisa pela API google vision + API google custom search
     public function pesquisarItem($imageData)
     {
-        // 2fe679ca178b2259be213f90a3634de95de53d16bf4699bb6f68b2f7b252b001
         $apiKey = env('APP_KEY_GOOGLE');
 
         $url = "https://vision.googleapis.com/v1/images:annotate?key=$apiKey";
