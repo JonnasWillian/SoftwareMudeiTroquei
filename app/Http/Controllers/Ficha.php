@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use Illuminate\Support\Facades\Http;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 use GuzzleHttp\Client;
 
 // Models
@@ -107,18 +109,17 @@ class Ficha extends Controller
 
         $imageData = $path ? $path : ($path2 ? $path2 : $path3);
         
-        $apiResponseCustomSearch = $this->pesquisarItem($imageData);
+        $apiResponseCustomSearch = $this->searchImageWithPrices($imageData);
 
         $prices = [];
         $liks = [];
         $fotos = [];
 
+        dd($apiResponseCustomSearch);
         // Exibir resultados ou processar conforme necessário
         if (!isset($apiResponseCustomSearch['items'])) {
-            $apiResponseCustomSearch = $this->pesquisarItem($imageData);
+            $apiResponseCustomSearch = $this->searchImageWithPrices($imageData);
         }
-
-        // dd($apiResponseCustomSearch);
 
         foreach ($apiResponseCustomSearch['items']as $item) {
             if (isset($item['snippet'])) {
@@ -194,99 +195,84 @@ class Ficha extends Controller
 
         // Cria uma nova ficha com os dados fornecidos
         FichaFomulario::create($inserir);
+        dd($apiResponseCustomSearch);
     }
 
     // Pesquisa pela serpapi com googleLens
-    public function searchWithGoogleLens($imageData)
+    function searchImageWithPrices($imageData)
     {
-        try {
-            // Configuração da API
-            $apiKey = env('SERPAPI_KEY');
-            $apiUrl = 'https://serpapi.com/search?engine=google_lens';
+        // Faz o upload da imagem para ImgBB
+        $imgbbApiUrl = 'https://api.imgbb.com/1/upload';
+        $imgbbApiKey = env('IMGBB_API_KEY'); // Chave da API ImgBB
 
-            // Envia o arquivo como upload multipart
-            $client = new Client();
-            
-            try {
-                $response = $client->request('GET', $apiUrl, [
-                    'multipart' => [
-                        [
-                            'name'     => 'engine',
-                            'contents' => 'google_lens'
-                        ],
-                        [
-                            'name'     => 'api_key',
-                            'contents' => $apiKey
-                        ],
-                        [
-                            'name'     => 'image_data',
-                            'contents' => $imageData,
-                        ]
-                    ]
-                ]);
+        $uploadResponse = Http::asForm()->post($imgbbApiUrl, [
+            'key' => $imgbbApiKey,
+            'image' => $imageData,
+        ]);
 
-                // Decodifica a resposta
-                $responseBody = $response->getBody()->getContents();
-                $responseData = json_decode($responseBody, true);
-
-                // Log detalhado da resposta
-                \Log::info('SerpAPI Full Response', [
-                    'body' => $responseBody,
-                    'parsed_data' => $responseData
-                ]);
-
-                // Verifica se há resultados válidos
-                if ($responseData === null) {
-                    return response()->json([
-                        'error' => 'Resposta da API inválida',
-                        'raw_response' => $responseBody
-                    ], 500);
-                }
-
-                // Retorna o resultado
-                return response()->json($responseData);
-
-            } catch (\GuzzleHttp\Exception\RequestException $e) {
-                // Log do erro detalhado
-                \Log::error('SerpAPI Request Error', [
-                    'message' => $e->getMessage(),
-                    'response' => $e->getResponse() ? $e->getResponse()->getBody()->getContents() : 'No response',
-                    'full_url' => $e->getRequest()->getUri()->__toString()
-                ]);
-
-                return response()->json([
-                    'error' => 'Erro na requisição', 
-                    'details' => $e->getMessage(),
-                    'url' => $e->getRequest()->getUri()->__toString()
-                ], 500);
-            }
-        } catch (\Exception $e) {
-            // Log de qualquer outro erro
-            \Log::error('Erro geral', [
-                'message' => $e->getMessage(),
-                'trace' => $e->getTraceAsString()
-            ]);
-
+        if (!$uploadResponse->successful()) {
             return response()->json([
-                'error' => 'Erro ao processar a imagem', 
-                'message' => $e->getMessage()
+                'success' => false,
+                'message' => 'Erro ao fazer upload da imagem.',
+                'error' => $uploadResponse->json(),
             ], 500);
         }
+
+        // Obtém a URL pública da imagem
+        $imageUrl = $uploadResponse->json()['data']['url'];
+
+        // Faz a requisição para a SerpApi
+        $serpApiUrl = 'https://serpapi.com/search';
+        $serpApiKey = env('SERPAPI_KEY');
+
+        $response = Http::get($serpApiUrl, [
+            'engine' => 'google_reverse_image',
+            'image_url' => $imageUrl,
+            'api_key' => $serpApiKey,
+        ]);
+
+        if ($response->successful()) {
+            $results = $response->json();
+
+            // Extrai informações úteis (ex.: preços, imagens, links)
+            $items = collect($results['visual_matches'] ?? [])->map(function ($item) {
+                return [
+                    'title' => $item['title'] ?? null,
+                    'price' => $item['price'] ?? null,
+                    'link' => $item['link'] ?? null,
+                    'image' => $item['thumbnail'] ?? null,
+                ];
+            });
+
+            return response()->json([
+                'success' => true,
+                'items' => $items,
+            ]);
+        }
+
+        return response()->json([
+            'success' => false,
+            'message' => 'Erro ao buscar resultados na SerpApi.',
+            'error' => $response->json(),
+        ], 500);
     }
 
     // Pesquisa pela API google vision + API google custom search
     public function pesquisarItem($imageData)
     {
         $apiKey = env('APP_KEY_GOOGLE');
-
         $url = "https://vision.googleapis.com/v1/images:annotate?key=$apiKey";
 
+        // Expandindo os tipos de detecção
         $payload = [
             'requests' => [
                 [
                     'image' => ['content' => $imageData],
                     'features' => [
-                        ['type' => 'WEB_DETECTION','maxResults' => 100000],
+                        ['type' => 'WEB_DETECTION', 'maxResults' => 100000],
+                        ['type' => 'LABEL_DETECTION', 'maxResults' => 15],
+                        ['type' => 'OBJECT_LOCALIZATION', 'maxResults' => 15],
+                        ['type' => 'TEXT_DETECTION'],
                     ],
                 ],
             ],
@@ -300,45 +286,70 @@ class Ficha extends Controller
         curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($payload));
 
         $response = curl_exec($ch);
-
-        if ($response === false) {
-            $error = curl_error($ch);
-            $info = curl_getinfo($ch);
-            curl_close($ch);
-        }
         curl_close($ch);
         
         $apiResponse = json_decode($response, true);
         $descriptions = [];
+        
         if (isset($apiResponse['responses'][0]['webDetection']['webEntities'])) {
             foreach ($apiResponse['responses'][0]['webDetection']['webEntities'] as $entity) {
-                if (isset($entity['description'])) {
-                    $descriptions[] = $entity['description']; // Armazena as descrições encontradas
+                if (isset($entity['description']) && strlen($entity['description']) > 2) {
+                    $descriptions[] = $entity['description'];
                 }
             }
         }
-        $descriptions[] = 'R$ / valor em real';
 
-        $cx = env('CX'); 
+        if (isset($apiResponse['responses'][0]['labelAnnotations'])) {
+            foreach ($apiResponse['responses'][0]['labelAnnotations'] as $label) {
+                if ($label['score'] > 0.7) { // Apenas labels com alta confiança
+                    $descriptions[] = $label['description'];
+                }
+            }
+        }
+
+        if (isset($apiResponse['responses'][0]['localizedObjectAnnotations'])) {
+            foreach ($apiResponse['responses'][0]['localizedObjectAnnotations'] as $object) {
+                if ($object['score'] > 0.7) {
+                    $descriptions[] = $object['name'];
+                }
+            }
+        }
+
+        if (isset($apiResponse['responses'][0]['textAnnotations'][0]['description'])) {
+            $texto = $apiResponse['responses'][0]['textAnnotations'][0]['description'];
+            $palavrasRelevantes = array_filter(
+                explode(' ', $texto),
+                function($palavra) {
+                    return strlen($palavra) > 3; // Filtra palavras muito curtas
+                }
+            );
+            $descriptions = array_merge($descriptions, $palavrasRelevantes);
+        }
+
+        $descriptions = array_unique($descriptions);
+        $stopWords = ['com', 'para', 'que', 'the', 'and', 'or']; // Expandir conforme necessário
+        $descriptions = array_diff($descriptions, $stopWords);
+
+        $descriptions[] = 'preço';
+        $descriptions[] = 'valor';
+        $descriptions[] = 'venda';
+
+        $cx = env('CX');
+        $searchTerms = implode(' ', array_slice($descriptions, 0, 10)); // Limitando a 10 termos mais relevantes
+        $urlCustomSearch = "https://www.googleapis.com/customsearch/v1?key=$apiKey&cx=$cx&q=" . 
+            urlencode($searchTerms) . 
+            "&sort=date" . // Ordenar por data para resultados mais recentes
+            "&num=10"; // Limitando a 10 resultados mais relevantes
         
-        $urlCustomSearch = "https://www.googleapis.com/customsearch/v1?key=$apiKey&cx=$cx&q=" . urlencode(implode(' ', $descriptions));
-
         $chCustomSearch = curl_init();
         curl_setopt($chCustomSearch, CURLOPT_URL, $urlCustomSearch);
         curl_setopt($chCustomSearch, CURLOPT_RETURNTRANSFER, true);
-
+        
         $responseCustomSearch = curl_exec($chCustomSearch);
-
-        if ($responseCustomSearch === false) {
-            $error = curl_error($chCustomSearch);
-            $info = curl_getinfo($chCustomSearch);
-            curl_close($chCustomSearch);
-        }
-
         curl_close($chCustomSearch);
-
+        
         $apiResponseCustomSearch = json_decode($responseCustomSearch, true);
-
+        
         return $apiResponseCustomSearch;
     }
 
